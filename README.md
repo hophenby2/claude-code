@@ -75,7 +75,7 @@ Claude Code "dreams" to consolidate memory. The **autoDream** service ([`src/ser
 ```text
 src/
 ├── main.tsx                 # CLI Entrypoint (Commander.js + React/Ink)
-├── QueryEngine.ts           # Core LLM logic (~46K lines)
+├── QueryEngine.ts           # Core LLM logic
 ├── Tool.ts                  # Base tool definitions
 ├── tools/                   # 40+ Agent tools (Bash, Files, LSP, Web)
 ├── services/                # Backend (MCP, OAuth, Analytics, Dreams)
