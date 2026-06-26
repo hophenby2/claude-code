@@ -1,0 +1,9 @@
+export type NotebookCell = any
+export type NotebookCellType = any
+export type NotebookOutputImage = any
+export type NotebookCellSourceOutput = any
+export type NotebookCellSource = any
+export type NotebookCellOutput = any
+export type NotebookContent = any
+export type NotebookEdit = any
+export type NotebookDocument = any

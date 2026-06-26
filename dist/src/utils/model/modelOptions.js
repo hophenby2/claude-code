@@ -1,3 +1,4 @@
+import { getAntModels } from "./antModels.js";
 import { getInitialMainLoopModel } from "../../bootstrap/state.js";
 import {
   isClaudeAISubscriber,

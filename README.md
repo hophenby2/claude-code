@@ -89,8 +89,25 @@ src/
 ## ⚙️ How to Use & Explore
 
 ### 📦 Prerequisites
-- **[Bun Runtime](https://bun.sh)** (Highly Recommended) or Node.js v18+
-- **TypeScript** installed globally
+- Node.js v22+ recommended for the reconstructed build scripts
+- npm
+- TypeScript is installed through the project dev dependencies
+
+### 🧪 Current Reconstructed Build Status
+
+This repository is currently a reconstructed local build, not a complete official release build. The supported Node/esbuild path is:
+
+```bash
+npm run build
+npm run smoke
+npm run smoke:bin
+npm run smoke:functional
+npm run syntaxcheck
+```
+
+The canonical built CLI entrypoint is `dist/src/entrypoints/cli.js`. `dist/cli.js`, if present, should be treated as a legacy or alternate bundle artifact.
+
+`npm run typecheck` is useful as a baseline while reconstructed type boundaries are narrowed, but it should not yet be treated as the main quality gate. Some feature-gated areas such as workflows, peers, assistant flows, monitor/review-artifact tools, and bundled skill content are still disabled, stubbed, or placeholder-backed.
 
 ### 🚀 Getting Started
 
@@ -110,9 +127,21 @@ src/
     npm run build
     ```
 
-4.  **Run the CLI:**
+4.  **Run the smoke check:**
     ```bash
-    node dist/main.js
+    npm run smoke
+    ```
+
+5.  **Run the built CLI directly:**
+    ```bash
+    node dist/src/entrypoints/cli.js --version
+    ```
+
+6.  **Run additional local baseline checks:**
+    ```bash
+    npm run smoke:bin
+    npm run smoke:functional
+    npm run syntaxcheck
     ```
 
 ### 🔍 Explore with MCP

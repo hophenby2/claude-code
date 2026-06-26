@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const feature = (_name) => false;
 process.env.COREPACK_ENABLE_AUTO_PIN = "0";
 if (process.env.CLAUDE_CODE_REMOTE === "true") {

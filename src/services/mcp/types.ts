@@ -160,13 +160,7 @@ export type McpClaudeAIProxyServerConfig = z.infer<
 >
 export type McpServerConfig = z.infer<ReturnType<typeof McpServerConfigSchema>>
 
-export type ScopedMcpServerConfig = McpServerConfig & {
-  scope: ConfigScope
-  // For plugin-provided servers: the providing plugin's LoadedPlugin.source
-  // (e.g. 'slack@anthropic'). Stashed at config-build time so the channel
-  // gate doesn't have to race AppState.plugins.enabled hydration.
-  pluginSource?: string
-}
+export type ScopedMcpServerConfig = any
 
 export const McpJsonConfigSchema = lazySchema(() =>
   z.object({

@@ -1,0 +1,4 @@
+const workerAgent = {};
+export {
+  workerAgent
+};

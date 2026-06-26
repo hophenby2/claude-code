@@ -425,6 +425,10 @@ function getInitialState(): State {
   return state
 }
 
+export function isReplBridgeActive(): boolean {
+  return Boolean((STATE as { replBridgeActive?: boolean }).replBridgeActive)
+}
+
 // AND ESPECIALLY HERE
 const STATE: State = getInitialState()
 

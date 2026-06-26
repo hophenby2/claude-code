@@ -1,0 +1,5 @@
+function useAntOrgWarningNotification() {
+}
+export {
+  useAntOrgWarningNotification
+};

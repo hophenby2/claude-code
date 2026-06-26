@@ -1,3 +1,4 @@
+import { resolveAntModel } from "./model/antModels.js";
 const feature = (_name) => false;
 import { getFeatureValue_CACHED_MAY_BE_STALE } from "../services/analytics/growthbook.js";
 import { getCanonicalName } from "./model/model.js";

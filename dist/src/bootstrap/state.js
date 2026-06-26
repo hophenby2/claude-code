@@ -161,6 +161,9 @@ function getInitialState() {
   };
   return state;
 }
+function isReplBridgeActive() {
+  return Boolean(STATE.replBridgeActive);
+}
 const STATE = getInitialState();
 function getSessionId() {
   return STATE.sessionId;
@@ -1145,6 +1148,7 @@ export {
   hasShownLspRecommendationThisSession,
   hasUnknownModelCost,
   incrementBudgetContinuationCount,
+  isReplBridgeActive,
   isSessionPersistenceDisabled,
   markFirstTeleportMessageLogged,
   markPostCompaction,

@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
+import { chmod, copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import esbuild from 'esbuild'
@@ -124,15 +124,6 @@ function sourceAssetPlaceholders() {
   return placeholders
 }
 
-async function ensureSourceAssetPlaceholders() {
-  for (const rel of sourceAssetPlaceholders()) {
-    const target = path.join(srcRoot, rel)
-    if (existsSync(target)) continue
-    await mkdir(path.dirname(target), { recursive: true })
-    await writeFile(target, `# Placeholder ${rel}\n`)
-  }
-}
-
 async function collectSourceEntrypoints(dir) {
   const entries = await readdir(dir, { withFileTypes: true })
   const result = []
@@ -209,7 +200,6 @@ async function copySourceAssets(dir) {
 }
 
 await mkdir(outdir, { recursive: true })
-await ensureSourceAssetPlaceholders()
 
 const fullBundle = process.env.FULL_BUNDLE === '1'
 const entryPoints = fullBundle
@@ -350,8 +340,20 @@ await esbuild.build({
   ],
 })
 
+async function ensureCliEntrypointIsExecutable() {
+  const cliPath = path.join(outdir, 'src/entrypoints/cli.js')
+  if (!existsSync(cliPath)) return
+
+  const source = await readFile(cliPath, 'utf8')
+  if (!source.startsWith('#!')) {
+    await writeFile(cliPath, `#!/usr/bin/env node\n${source}`)
+  }
+  await chmod(cliPath, 0o755)
+}
+
 if (!fullBundle) {
   await copySourceAssets(srcRoot)
+  await ensureCliEntrypointIsExecutable()
 }
 
 console.log(`Built ${fullBundle ? path.relative(root, path.join(outdir, 'cli.js')) : path.relative(root, path.join(outdir, 'src/entrypoints/cli.js'))} (${version}, ${fullBundle ? 'bundled' : 'transpiled'})`)
