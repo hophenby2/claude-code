@@ -1,0 +1,12 @@
+import { isEnvTruthy } from "../../utils/envUtils.js";
+const doctor = {
+  name: "doctor",
+  description: "Diagnose and verify your Claude Code installation and settings",
+  isEnabled: () => !isEnvTruthy(process.env.DISABLE_DOCTOR_COMMAND),
+  type: "local-jsx",
+  load: () => import("./doctor.js")
+};
+var doctor_default = doctor;
+export {
+  doctor_default as default
+};

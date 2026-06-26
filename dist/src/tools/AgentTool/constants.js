@@ -1,0 +1,13 @@
+const AGENT_TOOL_NAME = "Agent";
+const LEGACY_AGENT_TOOL_NAME = "Task";
+const VERIFICATION_AGENT_TYPE = "verification";
+const ONE_SHOT_BUILTIN_AGENT_TYPES = /* @__PURE__ */ new Set([
+  "Explore",
+  "Plan"
+]);
+export {
+  AGENT_TOOL_NAME,
+  LEGACY_AGENT_TOOL_NAME,
+  ONE_SHOT_BUILTIN_AGENT_TYPES,
+  VERIFICATION_AGENT_TYPE
+};

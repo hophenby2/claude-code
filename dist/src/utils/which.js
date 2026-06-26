@@ -1,0 +1,54 @@
+import { execa } from "execa";
+import { execSync_DEPRECATED } from "./execSyncWrapper.js";
+async function whichNodeAsync(command) {
+  if (process.platform === "win32") {
+    const result2 = await execa(`where.exe ${command}`, {
+      shell: true,
+      stderr: "ignore",
+      reject: false
+    });
+    if (result2.exitCode !== 0 || !result2.stdout) {
+      return null;
+    }
+    return result2.stdout.trim().split(/\r?\n/)[0] || null;
+  }
+  const result = await execa(`which ${command}`, {
+    shell: true,
+    stderr: "ignore",
+    reject: false
+  });
+  if (result.exitCode !== 0 || !result.stdout) {
+    return null;
+  }
+  return result.stdout.trim();
+}
+function whichNodeSync(command) {
+  if (process.platform === "win32") {
+    try {
+      const result = execSync_DEPRECATED(`where.exe ${command}`, {
+        encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"]
+      });
+      const output = result.toString().trim();
+      return output.split(/\r?\n/)[0] || null;
+    } catch {
+      return null;
+    }
+  }
+  try {
+    const result = execSync_DEPRECATED(`which ${command}`, {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"]
+    });
+    return result.toString().trim() || null;
+  } catch {
+    return null;
+  }
+}
+const bunWhich = typeof Bun !== "undefined" && typeof Bun.which === "function" ? Bun.which : null;
+const which = bunWhich ? async (command) => bunWhich(command) : whichNodeAsync;
+const whichSync = bunWhich ?? whichNodeSync;
+export {
+  which,
+  whichSync
+};

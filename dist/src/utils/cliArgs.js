@@ -1,0 +1,25 @@
+function eagerParseCliFlag(flagName, argv = process.argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg?.startsWith(`${flagName}=`)) {
+      return arg.slice(flagName.length + 1);
+    }
+    if (arg === flagName && i + 1 < argv.length) {
+      return argv[i + 1];
+    }
+  }
+  return void 0;
+}
+function extractArgsAfterDoubleDash(commandOrValue, args = []) {
+  if (commandOrValue === "--" && args.length > 0) {
+    return {
+      command: args[0],
+      args: args.slice(1)
+    };
+  }
+  return { command: commandOrValue, args };
+}
+export {
+  eagerParseCliFlag,
+  extractArgsAfterDoubleDash
+};

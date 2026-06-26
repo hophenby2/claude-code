@@ -1,0 +1,6 @@
+const EXIT_PLAN_MODE_TOOL_NAME = "ExitPlanMode";
+const EXIT_PLAN_MODE_V2_TOOL_NAME = "ExitPlanMode";
+export {
+  EXIT_PLAN_MODE_TOOL_NAME,
+  EXIT_PLAN_MODE_V2_TOOL_NAME
+};

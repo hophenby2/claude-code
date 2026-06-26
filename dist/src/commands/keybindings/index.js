@@ -1,0 +1,13 @@
+import { isKeybindingCustomizationEnabled } from "../../keybindings/loadUserBindings.js";
+const keybindings = {
+  name: "keybindings",
+  description: "Open or create your keybindings configuration file",
+  isEnabled: () => isKeybindingCustomizationEnabled(),
+  supportsNonInteractive: false,
+  type: "local",
+  load: () => import("./keybindings.js")
+};
+var keybindings_default = keybindings;
+export {
+  keybindings_default as default
+};

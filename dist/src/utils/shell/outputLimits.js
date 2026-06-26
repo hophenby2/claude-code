@@ -1,0 +1,17 @@
+import { validateBoundedIntEnvVar } from "../envValidation.js";
+const BASH_MAX_OUTPUT_UPPER_LIMIT = 15e4;
+const BASH_MAX_OUTPUT_DEFAULT = 3e4;
+function getMaxOutputLength() {
+  const result = validateBoundedIntEnvVar(
+    "BASH_MAX_OUTPUT_LENGTH",
+    process.env.BASH_MAX_OUTPUT_LENGTH,
+    BASH_MAX_OUTPUT_DEFAULT,
+    BASH_MAX_OUTPUT_UPPER_LIMIT
+  );
+  return result.effective;
+}
+export {
+  BASH_MAX_OUTPUT_DEFAULT,
+  BASH_MAX_OUTPUT_UPPER_LIMIT,
+  getMaxOutputLength
+};

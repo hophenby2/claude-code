@@ -1,0 +1,9 @@
+var diff_default = {
+  type: "local-jsx",
+  name: "diff",
+  description: "View uncommitted changes and per-turn diffs",
+  load: () => import("./diff.js")
+};
+export {
+  diff_default as default
+};

@@ -1,0 +1,10 @@
+const FILE_EDIT_TOOL_NAME = "Edit";
+const CLAUDE_FOLDER_PERMISSION_PATTERN = "/.claude/**";
+const GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN = "~/.claude/**";
+const FILE_UNEXPECTEDLY_MODIFIED_ERROR = "File has been unexpectedly modified. Read it again before attempting to write it.";
+export {
+  CLAUDE_FOLDER_PERMISSION_PATTERN,
+  FILE_EDIT_TOOL_NAME,
+  FILE_UNEXPECTEDLY_MODIFIED_ERROR,
+  GLOBAL_CLAUDE_FOLDER_PERMISSION_PATTERN
+};

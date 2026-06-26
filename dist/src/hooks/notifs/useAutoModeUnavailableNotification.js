@@ -1,0 +1,40 @@
+const feature = (_name) => false;
+import { useEffect, useRef } from "react";
+import { useNotifications } from "../../context/notifications.js";
+import { getIsRemoteMode } from "../../bootstrap/state.js";
+import { useAppState } from "../../state/AppState.js";
+import {
+  getAutoModeUnavailableNotification,
+  getAutoModeUnavailableReason
+} from "../../utils/permissions/permissionSetup.js";
+import { hasAutoModeOptIn } from "../../utils/settings/settings.js";
+function useAutoModeUnavailableNotification() {
+  const { addNotification } = useNotifications();
+  const mode = useAppState((s) => s.toolPermissionContext.mode);
+  const isAutoModeAvailable = useAppState(
+    (s) => s.toolPermissionContext.isAutoModeAvailable
+  );
+  const shownRef = useRef(false);
+  const prevModeRef = useRef(mode);
+  useEffect(() => {
+    const prevMode = prevModeRef.current;
+    prevModeRef.current = mode;
+    if (true) return;
+    if (getIsRemoteMode()) return;
+    if (shownRef.current) return;
+    const wrappedPastAutoSlot = mode === "default" && prevMode !== "default" && prevMode !== "auto" && !isAutoModeAvailable && hasAutoModeOptIn();
+    if (!wrappedPastAutoSlot) return;
+    const reason = getAutoModeUnavailableReason();
+    if (!reason) return;
+    shownRef.current = true;
+    addNotification({
+      key: "auto-mode-unavailable",
+      text: getAutoModeUnavailableNotification(reason),
+      color: "warning",
+      priority: "medium"
+    });
+  }, [mode, isAutoModeAvailable, addNotification]);
+}
+export {
+  useAutoModeUnavailableNotification
+};

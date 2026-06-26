@@ -1,0 +1,4 @@
+const FRAME_INTERVAL_MS = 16;
+export {
+  FRAME_INTERVAL_MS
+};

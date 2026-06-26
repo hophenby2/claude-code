@@ -1,0 +1,11 @@
+const releaseNotes = {
+  description: "View release notes",
+  name: "release-notes",
+  type: "local",
+  supportsNonInteractive: true,
+  load: () => import("./release-notes.js")
+};
+var release_notes_default = releaseNotes;
+export {
+  release_notes_default as default
+};

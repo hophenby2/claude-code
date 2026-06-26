@@ -1,0 +1,107 @@
+import { jsx } from "react/jsx-runtime";
+import { c as _c } from "react/compiler-runtime";
+import figures from "figures";
+import { useEffect } from "react";
+import { Box, Text } from "../../ink.js";
+import { errorMessage } from "../../utils/errors.js";
+import { logError } from "../../utils/log.js";
+import { validateManifest } from "../../utils/plugins/validatePlugin.js";
+import { plural } from "../../utils/stringUtils.js";
+function ValidatePlugin(t0) {
+  const $ = _c(5);
+  const {
+    onComplete,
+    path
+  } = t0;
+  let t1;
+  let t2;
+  if ($[0] !== onComplete || $[1] !== path) {
+    t1 = () => {
+      const runValidation = async function runValidation2() {
+        if (!path) {
+          onComplete("Usage: /plugin validate <path>\n\nValidate a plugin or marketplace manifest file or directory.\n\nExamples:\n  /plugin validate .claude-plugin/plugin.json\n  /plugin validate /path/to/plugin-directory\n  /plugin validate .\n\nWhen given a directory, automatically validates .claude-plugin/marketplace.json\nor .claude-plugin/plugin.json (prefers marketplace if both exist).\n\nOr from the command line:\n  claude plugin validate <path>");
+          return;
+        }
+        ;
+        try {
+          const result = await validateManifest(path);
+          let output = "";
+          output = output + `Validating ${result.fileType} manifest: ${result.filePath}
+
+`;
+          output;
+          if (result.errors.length > 0) {
+            output = output + `${figures.cross} Found ${result.errors.length} ${plural(result.errors.length, "error")}:
+
+`;
+            output;
+            result.errors.forEach((error_0) => {
+              output = output + `  ${figures.pointer} ${error_0.path}: ${error_0.message}
+`;
+              output;
+            });
+            output = output + "\n";
+            output;
+          }
+          if (result.warnings.length > 0) {
+            output = output + `${figures.warning} Found ${result.warnings.length} ${plural(result.warnings.length, "warning")}:
+
+`;
+            output;
+            result.warnings.forEach((warning) => {
+              output = output + `  ${figures.pointer} ${warning.path}: ${warning.message}
+`;
+              output;
+            });
+            output = output + "\n";
+            output;
+          }
+          if (result.success) {
+            if (result.warnings.length > 0) {
+              output = output + `${figures.tick} Validation passed with warnings
+`;
+              output;
+            } else {
+              output = output + `${figures.tick} Validation passed
+`;
+              output;
+            }
+            process.exitCode = 0;
+          } else {
+            output = output + `${figures.cross} Validation failed
+`;
+            output;
+            process.exitCode = 1;
+          }
+          onComplete(output);
+        } catch (t32) {
+          const error = t32;
+          process.exitCode = 2;
+          logError(error);
+          onComplete(`${figures.cross} Unexpected error during validation: ${errorMessage(error)}`);
+        }
+      };
+      runValidation();
+    };
+    t2 = [onComplete, path];
+    $[0] = onComplete;
+    $[1] = path;
+    $[2] = t1;
+    $[3] = t2;
+  } else {
+    t1 = $[2];
+    t2 = $[3];
+  }
+  useEffect(t1, t2);
+  let t3;
+  if ($[4] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
+    t3 = /* @__PURE__ */ jsx(Box, { flexDirection: "column", children: /* @__PURE__ */ jsx(Text, { children: "Running validation..." }) });
+    $[4] = t3;
+  } else {
+    t3 = $[4];
+  }
+  return t3;
+}
+export {
+  ValidatePlugin
+};

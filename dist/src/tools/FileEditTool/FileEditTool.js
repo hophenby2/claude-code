@@ -1,0 +1,480 @@
+import { dirname, isAbsolute, sep } from "path";
+import { logEvent } from "../../services/analytics/index.js";
+import { getFeatureValue_CACHED_MAY_BE_STALE } from "../../services/analytics/growthbook.js";
+import { diagnosticTracker } from "../../services/diagnosticTracking.js";
+import { clearDeliveredDiagnosticsForFile } from "../../services/lsp/LSPDiagnosticRegistry.js";
+import { getLspServerManager } from "../../services/lsp/manager.js";
+import { notifyVscodeFileUpdated } from "../../services/mcp/vscodeSdkMcp.js";
+import { checkTeamMemSecrets } from "../../services/teamMemorySync/teamMemSecretGuard.js";
+import {
+  activateConditionalSkillsForPaths,
+  addSkillDirectories,
+  discoverSkillDirsForPaths
+} from "../../skills/loadSkillsDir.js";
+import { buildTool } from "../../Tool.js";
+import { getCwd } from "../../utils/cwd.js";
+import { logForDebugging } from "../../utils/debug.js";
+import { countLinesChanged } from "../../utils/diff.js";
+import { isEnvTruthy } from "../../utils/envUtils.js";
+import { isENOENT } from "../../utils/errors.js";
+import {
+  FILE_NOT_FOUND_CWD_NOTE,
+  findSimilarFile,
+  getFileModificationTime,
+  suggestPathUnderCwd,
+  writeTextContent
+} from "../../utils/file.js";
+import {
+  fileHistoryEnabled,
+  fileHistoryTrackEdit
+} from "../../utils/fileHistory.js";
+import { logFileOperation } from "../../utils/fileOperationAnalytics.js";
+import {
+  readFileSyncWithMetadata
+} from "../../utils/fileRead.js";
+import { formatFileSize } from "../../utils/format.js";
+import { getFsImplementation } from "../../utils/fsOperations.js";
+import {
+  fetchSingleFileGitDiff
+} from "../../utils/gitDiff.js";
+import { logError } from "../../utils/log.js";
+import { expandPath } from "../../utils/path.js";
+import {
+  checkWritePermissionForTool,
+  matchingRuleForInput
+} from "../../utils/permissions/filesystem.js";
+import { matchWildcardPattern } from "../../utils/permissions/shellRuleMatching.js";
+import { validateInputForSettingsFileEdit } from "../../utils/settings/validateEditTool.js";
+import { NOTEBOOK_EDIT_TOOL_NAME } from "../NotebookEditTool/constants.js";
+import {
+  FILE_EDIT_TOOL_NAME,
+  FILE_UNEXPECTEDLY_MODIFIED_ERROR
+} from "./constants.js";
+import { getEditToolDescription } from "./prompt.js";
+import {
+  inputSchema,
+  outputSchema
+} from "./types.js";
+import {
+  getToolUseSummary,
+  renderToolResultMessage,
+  renderToolUseErrorMessage,
+  renderToolUseMessage,
+  renderToolUseRejectedMessage,
+  userFacingName
+} from "./UI.js";
+import {
+  areFileEditsInputsEquivalent,
+  findActualString,
+  getPatchForEdit,
+  preserveQuoteStyle
+} from "./utils.js";
+const MAX_EDIT_FILE_SIZE = 1024 * 1024 * 1024;
+const FileEditTool = buildTool({
+  name: FILE_EDIT_TOOL_NAME,
+  searchHint: "modify file contents in place",
+  maxResultSizeChars: 1e5,
+  strict: true,
+  async description() {
+    return "A tool for editing files";
+  },
+  async prompt() {
+    return getEditToolDescription();
+  },
+  userFacingName,
+  getToolUseSummary,
+  getActivityDescription(input) {
+    const summary = getToolUseSummary(input);
+    return summary ? `Editing ${summary}` : "Editing file";
+  },
+  get inputSchema() {
+    return inputSchema();
+  },
+  get outputSchema() {
+    return outputSchema();
+  },
+  toAutoClassifierInput(input) {
+    return `${input.file_path}: ${input.new_string}`;
+  },
+  getPath(input) {
+    return input.file_path;
+  },
+  backfillObservableInput(input) {
+    if (typeof input.file_path === "string") {
+      input.file_path = expandPath(input.file_path);
+    }
+  },
+  async preparePermissionMatcher({ file_path }) {
+    return (pattern) => matchWildcardPattern(pattern, file_path);
+  },
+  async checkPermissions(input, context) {
+    const appState = context.getAppState();
+    return checkWritePermissionForTool(
+      FileEditTool,
+      input,
+      appState.toolPermissionContext
+    );
+  },
+  renderToolUseMessage,
+  renderToolResultMessage,
+  renderToolUseRejectedMessage,
+  renderToolUseErrorMessage,
+  async validateInput(input, toolUseContext) {
+    const { file_path, old_string, new_string, replace_all = false } = input;
+    const fullFilePath = expandPath(file_path);
+    const secretError = checkTeamMemSecrets(fullFilePath, new_string);
+    if (secretError) {
+      return { result: false, message: secretError, errorCode: 0 };
+    }
+    if (old_string === new_string) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: "No changes to make: old_string and new_string are exactly the same.",
+        errorCode: 1
+      };
+    }
+    const appState = toolUseContext.getAppState();
+    const denyRule = matchingRuleForInput(
+      fullFilePath,
+      appState.toolPermissionContext,
+      "edit",
+      "deny"
+    );
+    if (denyRule !== null) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: "File is in a directory that is denied by your permission settings.",
+        errorCode: 2
+      };
+    }
+    if (fullFilePath.startsWith("\\\\") || fullFilePath.startsWith("//")) {
+      return { result: true };
+    }
+    const fs = getFsImplementation();
+    try {
+      const { size } = await fs.stat(fullFilePath);
+      if (size > MAX_EDIT_FILE_SIZE) {
+        return {
+          result: false,
+          behavior: "ask",
+          message: `File is too large to edit (${formatFileSize(size)}). Maximum editable file size is ${formatFileSize(MAX_EDIT_FILE_SIZE)}.`,
+          errorCode: 10
+        };
+      }
+    } catch (e) {
+      if (!isENOENT(e)) {
+        throw e;
+      }
+    }
+    let fileContent;
+    try {
+      const fileBuffer = await fs.readFileBytes(fullFilePath);
+      const encoding = fileBuffer.length >= 2 && fileBuffer[0] === 255 && fileBuffer[1] === 254 ? "utf16le" : "utf8";
+      fileContent = fileBuffer.toString(encoding).replaceAll("\r\n", "\n");
+    } catch (e) {
+      if (isENOENT(e)) {
+        fileContent = null;
+      } else {
+        throw e;
+      }
+    }
+    if (fileContent === null) {
+      if (old_string === "") {
+        return { result: true };
+      }
+      const similarFilename = findSimilarFile(fullFilePath);
+      const cwdSuggestion = await suggestPathUnderCwd(fullFilePath);
+      let message = `File does not exist. ${FILE_NOT_FOUND_CWD_NOTE} ${getCwd()}.`;
+      if (cwdSuggestion) {
+        message += ` Did you mean ${cwdSuggestion}?`;
+      } else if (similarFilename) {
+        message += ` Did you mean ${similarFilename}?`;
+      }
+      return {
+        result: false,
+        behavior: "ask",
+        message,
+        errorCode: 4
+      };
+    }
+    if (old_string === "") {
+      if (fileContent.trim() !== "") {
+        return {
+          result: false,
+          behavior: "ask",
+          message: "Cannot create new file - file already exists.",
+          errorCode: 3
+        };
+      }
+      return {
+        result: true
+      };
+    }
+    if (fullFilePath.endsWith(".ipynb")) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: `File is a Jupyter Notebook. Use the ${NOTEBOOK_EDIT_TOOL_NAME} to edit this file.`,
+        errorCode: 5
+      };
+    }
+    const readTimestamp = toolUseContext.readFileState.get(fullFilePath);
+    if (!readTimestamp || readTimestamp.isPartialView) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: "File has not been read yet. Read it first before writing to it.",
+        meta: {
+          isFilePathAbsolute: String(isAbsolute(file_path))
+        },
+        errorCode: 6
+      };
+    }
+    if (readTimestamp) {
+      const lastWriteTime = getFileModificationTime(fullFilePath);
+      if (lastWriteTime > readTimestamp.timestamp) {
+        const isFullRead = readTimestamp.offset === void 0 && readTimestamp.limit === void 0;
+        if (isFullRead && fileContent === readTimestamp.content) {
+        } else {
+          return {
+            result: false,
+            behavior: "ask",
+            message: "File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.",
+            errorCode: 7
+          };
+        }
+      }
+    }
+    const file = fileContent;
+    const actualOldString = findActualString(file, old_string);
+    if (!actualOldString) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: `String to replace not found in file.
+String: ${old_string}`,
+        meta: {
+          isFilePathAbsolute: String(isAbsolute(file_path))
+        },
+        errorCode: 8
+      };
+    }
+    const matches = file.split(actualOldString).length - 1;
+    if (matches > 1 && !replace_all) {
+      return {
+        result: false,
+        behavior: "ask",
+        message: `Found ${matches} matches of the string to replace, but replace_all is false. To replace all occurrences, set replace_all to true. To replace only one occurrence, please provide more context to uniquely identify the instance.
+String: ${old_string}`,
+        meta: {
+          isFilePathAbsolute: String(isAbsolute(file_path)),
+          actualOldString
+        },
+        errorCode: 9
+      };
+    }
+    const settingsValidationResult = validateInputForSettingsFileEdit(
+      fullFilePath,
+      file,
+      () => {
+        return replace_all ? file.replaceAll(actualOldString, new_string) : file.replace(actualOldString, new_string);
+      }
+    );
+    if (settingsValidationResult !== null) {
+      return settingsValidationResult;
+    }
+    return { result: true, meta: { actualOldString } };
+  },
+  inputsEquivalent(input1, input2) {
+    return areFileEditsInputsEquivalent(
+      {
+        file_path: input1.file_path,
+        edits: [
+          {
+            old_string: input1.old_string,
+            new_string: input1.new_string,
+            replace_all: input1.replace_all ?? false
+          }
+        ]
+      },
+      {
+        file_path: input2.file_path,
+        edits: [
+          {
+            old_string: input2.old_string,
+            new_string: input2.new_string,
+            replace_all: input2.replace_all ?? false
+          }
+        ]
+      }
+    );
+  },
+  async call(input, {
+    readFileState,
+    userModified,
+    updateFileHistoryState,
+    dynamicSkillDirTriggers
+  }, _, parentMessage) {
+    const { file_path, old_string, new_string, replace_all = false } = input;
+    const fs = getFsImplementation();
+    const absoluteFilePath = expandPath(file_path);
+    const cwd = getCwd();
+    if (!isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)) {
+      const newSkillDirs = await discoverSkillDirsForPaths(
+        [absoluteFilePath],
+        cwd
+      );
+      if (newSkillDirs.length > 0) {
+        for (const dir of newSkillDirs) {
+          dynamicSkillDirTriggers?.add(dir);
+        }
+        addSkillDirectories(newSkillDirs).catch(() => {
+        });
+      }
+      activateConditionalSkillsForPaths([absoluteFilePath], cwd);
+    }
+    await diagnosticTracker.beforeFileEdited(absoluteFilePath);
+    await fs.mkdir(dirname(absoluteFilePath));
+    if (fileHistoryEnabled()) {
+      await fileHistoryTrackEdit(
+        updateFileHistoryState,
+        absoluteFilePath,
+        parentMessage.uuid
+      );
+    }
+    const {
+      content: originalFileContents,
+      fileExists,
+      encoding,
+      lineEndings: endings
+    } = readFileForEdit(absoluteFilePath);
+    if (fileExists) {
+      const lastWriteTime = getFileModificationTime(absoluteFilePath);
+      const lastRead = readFileState.get(absoluteFilePath);
+      if (!lastRead || lastWriteTime > lastRead.timestamp) {
+        const isFullRead = lastRead && lastRead.offset === void 0 && lastRead.limit === void 0;
+        const contentUnchanged = isFullRead && originalFileContents === lastRead.content;
+        if (!contentUnchanged) {
+          throw new Error(FILE_UNEXPECTEDLY_MODIFIED_ERROR);
+        }
+      }
+    }
+    const actualOldString = findActualString(originalFileContents, old_string) || old_string;
+    const actualNewString = preserveQuoteStyle(
+      old_string,
+      actualOldString,
+      new_string
+    );
+    const { patch, updatedFile } = getPatchForEdit({
+      filePath: absoluteFilePath,
+      fileContents: originalFileContents,
+      oldString: actualOldString,
+      newString: actualNewString,
+      replaceAll: replace_all
+    });
+    writeTextContent(absoluteFilePath, updatedFile, encoding, endings);
+    const lspManager = getLspServerManager();
+    if (lspManager) {
+      clearDeliveredDiagnosticsForFile(`file://${absoluteFilePath}`);
+      lspManager.changeFile(absoluteFilePath, updatedFile).catch((err) => {
+        logForDebugging(
+          `LSP: Failed to notify server of file change for ${absoluteFilePath}: ${err.message}`
+        );
+        logError(err);
+      });
+      lspManager.saveFile(absoluteFilePath).catch((err) => {
+        logForDebugging(
+          `LSP: Failed to notify server of file save for ${absoluteFilePath}: ${err.message}`
+        );
+        logError(err);
+      });
+    }
+    notifyVscodeFileUpdated(absoluteFilePath, originalFileContents, updatedFile);
+    readFileState.set(absoluteFilePath, {
+      content: updatedFile,
+      timestamp: getFileModificationTime(absoluteFilePath),
+      offset: void 0,
+      limit: void 0
+    });
+    if (absoluteFilePath.endsWith(`${sep}CLAUDE.md`)) {
+      logEvent("tengu_write_claudemd", {});
+    }
+    countLinesChanged(patch);
+    logFileOperation({
+      operation: "edit",
+      tool: "FileEditTool",
+      filePath: absoluteFilePath
+    });
+    logEvent("tengu_edit_string_lengths", {
+      oldStringBytes: Buffer.byteLength(old_string, "utf8"),
+      newStringBytes: Buffer.byteLength(new_string, "utf8"),
+      replaceAll: replace_all
+    });
+    let gitDiff;
+    if (isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) && getFeatureValue_CACHED_MAY_BE_STALE("tengu_quartz_lantern", false)) {
+      const startTime = Date.now();
+      const diff = await fetchSingleFileGitDiff(absoluteFilePath);
+      if (diff) gitDiff = diff;
+      logEvent("tengu_tool_use_diff_computed", {
+        isEditTool: true,
+        durationMs: Date.now() - startTime,
+        hasDiff: !!diff
+      });
+    }
+    const data = {
+      filePath: file_path,
+      oldString: actualOldString,
+      newString: new_string,
+      originalFile: originalFileContents,
+      structuredPatch: patch,
+      userModified: userModified ?? false,
+      replaceAll: replace_all,
+      ...gitDiff && { gitDiff }
+    };
+    return {
+      data
+    };
+  },
+  mapToolResultToToolResultBlockParam(data, toolUseID) {
+    const { filePath, userModified, replaceAll } = data;
+    const modifiedNote = userModified ? ".  The user modified your proposed changes before accepting them. " : "";
+    if (replaceAll) {
+      return {
+        tool_use_id: toolUseID,
+        type: "tool_result",
+        content: `The file ${filePath} has been updated${modifiedNote}. All occurrences were successfully replaced.`
+      };
+    }
+    return {
+      tool_use_id: toolUseID,
+      type: "tool_result",
+      content: `The file ${filePath} has been updated successfully${modifiedNote}.`
+    };
+  }
+});
+function readFileForEdit(absoluteFilePath) {
+  try {
+    const meta = readFileSyncWithMetadata(absoluteFilePath);
+    return {
+      content: meta.content,
+      fileExists: true,
+      encoding: meta.encoding,
+      lineEndings: meta.lineEndings
+    };
+  } catch (e) {
+    if (isENOENT(e)) {
+      return {
+        content: "",
+        fileExists: false,
+        encoding: "utf8",
+        lineEndings: "LF"
+      };
+    }
+    throw e;
+  }
+}
+export {
+  FileEditTool
+};

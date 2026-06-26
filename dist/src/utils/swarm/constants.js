@@ -1,0 +1,22 @@
+const TEAM_LEAD_NAME = "team-lead";
+const SWARM_SESSION_NAME = "claude-swarm";
+const SWARM_VIEW_WINDOW_NAME = "swarm-view";
+const TMUX_COMMAND = "tmux";
+const HIDDEN_SESSION_NAME = "claude-hidden";
+function getSwarmSocketName() {
+  return `claude-swarm-${process.pid}`;
+}
+const TEAMMATE_COMMAND_ENV_VAR = "CLAUDE_CODE_TEAMMATE_COMMAND";
+const TEAMMATE_COLOR_ENV_VAR = "CLAUDE_CODE_AGENT_COLOR";
+const PLAN_MODE_REQUIRED_ENV_VAR = "CLAUDE_CODE_PLAN_MODE_REQUIRED";
+export {
+  HIDDEN_SESSION_NAME,
+  PLAN_MODE_REQUIRED_ENV_VAR,
+  SWARM_SESSION_NAME,
+  SWARM_VIEW_WINDOW_NAME,
+  TEAMMATE_COLOR_ENV_VAR,
+  TEAMMATE_COMMAND_ENV_VAR,
+  TEAM_LEAD_NAME,
+  TMUX_COMMAND,
+  getSwarmSocketName
+};

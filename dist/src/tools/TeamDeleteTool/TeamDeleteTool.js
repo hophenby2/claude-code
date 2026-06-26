@@ -1,0 +1,102 @@
+import { z } from "zod/v4";
+import { logEvent } from "../../services/analytics/index.js";
+import { buildTool } from "../../Tool.js";
+import { isAgentSwarmsEnabled } from "../../utils/agentSwarmsEnabled.js";
+import { lazySchema } from "../../utils/lazySchema.js";
+import { jsonStringify } from "../../utils/slowOperations.js";
+import { TEAM_LEAD_NAME } from "../../utils/swarm/constants.js";
+import {
+  cleanupTeamDirectories,
+  readTeamFile,
+  unregisterTeamForSessionCleanup
+} from "../../utils/swarm/teamHelpers.js";
+import { clearTeammateColors } from "../../utils/swarm/teammateLayoutManager.js";
+import { clearLeaderTeamName } from "../../utils/tasks.js";
+import { TEAM_DELETE_TOOL_NAME } from "./constants.js";
+import { getPrompt } from "./prompt.js";
+import { renderToolResultMessage, renderToolUseMessage } from "./UI.js";
+const inputSchema = lazySchema(() => z.strictObject({}));
+const TeamDeleteTool = buildTool({
+  name: TEAM_DELETE_TOOL_NAME,
+  searchHint: "disband a swarm team and clean up",
+  maxResultSizeChars: 1e5,
+  shouldDefer: true,
+  userFacingName() {
+    return "";
+  },
+  get inputSchema() {
+    return inputSchema();
+  },
+  isEnabled() {
+    return isAgentSwarmsEnabled();
+  },
+  async description() {
+    return "Clean up team and task directories when the swarm is complete";
+  },
+  async prompt() {
+    return getPrompt();
+  },
+  mapToolResultToToolResultBlockParam(data, toolUseID) {
+    return {
+      tool_use_id: toolUseID,
+      type: "tool_result",
+      content: [
+        {
+          type: "text",
+          text: jsonStringify(data)
+        }
+      ]
+    };
+  },
+  async call(_input, context) {
+    const { setAppState, getAppState } = context;
+    const appState = getAppState();
+    const teamName = appState.teamContext?.teamName;
+    if (teamName) {
+      const teamFile = readTeamFile(teamName);
+      if (teamFile) {
+        const nonLeadMembers = teamFile.members.filter(
+          (m) => m.name !== TEAM_LEAD_NAME
+        );
+        const activeMembers = nonLeadMembers.filter((m) => m.isActive !== false);
+        if (activeMembers.length > 0) {
+          const memberNames = activeMembers.map((m) => m.name).join(", ");
+          return {
+            data: {
+              success: false,
+              message: `Cannot cleanup team with ${activeMembers.length} active member(s): ${memberNames}. Use requestShutdown to gracefully terminate teammates first.`,
+              team_name: teamName
+            }
+          };
+        }
+      }
+      await cleanupTeamDirectories(teamName);
+      unregisterTeamForSessionCleanup(teamName);
+      clearTeammateColors();
+      clearLeaderTeamName();
+      logEvent("tengu_team_deleted", {
+        team_name: teamName
+      });
+    }
+    setAppState((prev) => ({
+      ...prev,
+      teamContext: void 0,
+      inbox: {
+        messages: []
+        // Clear any queued messages
+      }
+    }));
+    return {
+      data: {
+        success: true,
+        message: teamName ? `Cleaned up directories and worktrees for team "${teamName}"` : "No team name found, nothing to clean up",
+        team_name: teamName
+      }
+    };
+  },
+  renderToolUseMessage,
+  renderToolResultMessage
+});
+export {
+  TeamDeleteTool
+};

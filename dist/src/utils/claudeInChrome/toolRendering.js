@@ -1,0 +1,214 @@
+import { jsx, jsxs } from "react/jsx-runtime";
+import { MessageResponse } from "../../components/MessageResponse.js";
+import { supportsHyperlinks } from "../../ink/supports-hyperlinks.js";
+import { Link, Text } from "../../ink.js";
+import { renderToolResultMessage as renderDefaultMCPToolResultMessage } from "../../tools/MCPTool/UI.js";
+import { truncateToWidth } from "../format.js";
+import { trackClaudeInChromeTabId } from "./common.js";
+const CHROME_EXTENSION_FOCUS_TAB_URL_BASE = "https://clau.de/chrome/tab/";
+function renderChromeToolUseMessage(input, toolName, verbose) {
+  const tabId = input.tabId;
+  if (typeof tabId === "number") {
+    trackClaudeInChromeTabId(tabId);
+  }
+  const secondaryInfo = [];
+  switch (toolName) {
+    case "navigate":
+      if (typeof input.url === "string") {
+        try {
+          const url = new URL(input.url);
+          secondaryInfo.push(url.hostname);
+        } catch {
+          secondaryInfo.push(truncateToWidth(input.url, 30));
+        }
+      }
+      break;
+    case "find":
+      if (typeof input.query === "string") {
+        secondaryInfo.push(`pattern: ${truncateToWidth(input.query, 30)}`);
+      }
+      break;
+    case "computer":
+      if (typeof input.action === "string") {
+        const action = input.action;
+        if (action === "left_click" || action === "right_click" || action === "double_click" || action === "middle_click") {
+          if (typeof input.ref === "string") {
+            secondaryInfo.push(`${action} on ${input.ref}`);
+          } else if (Array.isArray(input.coordinate)) {
+            secondaryInfo.push(`${action} at (${input.coordinate.join(", ")})`);
+          } else {
+            secondaryInfo.push(action);
+          }
+        } else if (action === "type" && typeof input.text === "string") {
+          secondaryInfo.push(`type "${truncateToWidth(input.text, 15)}"`);
+        } else if (action === "key" && typeof input.text === "string") {
+          secondaryInfo.push(`key ${input.text}`);
+        } else if (action === "scroll" && typeof input.scroll_direction === "string") {
+          secondaryInfo.push(`scroll ${input.scroll_direction}`);
+        } else if (action === "wait" && typeof input.duration === "number") {
+          secondaryInfo.push(`wait ${input.duration}s`);
+        } else if (action === "left_click_drag") {
+          secondaryInfo.push("drag");
+        } else {
+          secondaryInfo.push(action);
+        }
+      }
+      break;
+    case "gif_creator":
+      if (typeof input.action === "string") {
+        secondaryInfo.push(`${input.action}`);
+      }
+      break;
+    case "resize_window":
+      if (typeof input.width === "number" && typeof input.height === "number") {
+        secondaryInfo.push(`${input.width}x${input.height}`);
+      }
+      break;
+    case "read_console_messages":
+      if (typeof input.pattern === "string") {
+        secondaryInfo.push(`pattern: ${truncateToWidth(input.pattern, 20)}`);
+      }
+      if (input.onlyErrors === true) {
+        secondaryInfo.push("errors only");
+      }
+      break;
+    case "read_network_requests":
+      if (typeof input.urlPattern === "string") {
+        secondaryInfo.push(`pattern: ${truncateToWidth(input.urlPattern, 20)}`);
+      }
+      break;
+    case "shortcuts_execute":
+      if (typeof input.shortcutId === "string") {
+        secondaryInfo.push(`shortcut_id: ${input.shortcutId}`);
+      }
+      break;
+    case "javascript_tool":
+      if (verbose && typeof input.text === "string") {
+        return input.text;
+      }
+      return "";
+    case "tabs_create_mcp":
+    case "tabs_context_mcp":
+    case "form_input":
+    case "shortcuts_list":
+    case "read_page":
+    case "upload_image":
+    case "get_page_text":
+    case "update_plan":
+      return "";
+  }
+  return secondaryInfo.join(", ") || null;
+}
+function renderChromeViewTabLink(input) {
+  if (!supportsHyperlinks()) {
+    return null;
+  }
+  if (typeof input !== "object" || input === null || !("tabId" in input)) {
+    return null;
+  }
+  const tabId = typeof input.tabId === "number" ? input.tabId : typeof input.tabId === "string" ? parseInt(input.tabId, 10) : NaN;
+  if (isNaN(tabId)) {
+    return null;
+  }
+  const linkUrl = `${CHROME_EXTENSION_FOCUS_TAB_URL_BASE}${tabId}`;
+  return /* @__PURE__ */ jsxs(Text, { children: [
+    " ",
+    /* @__PURE__ */ jsx(Link, { url: linkUrl, children: /* @__PURE__ */ jsx(Text, { color: "subtle", children: "[View Tab]" }) })
+  ] });
+}
+function renderChromeToolResultMessage(output, toolName, verbose) {
+  if (verbose) {
+    return renderDefaultMCPToolResultMessage(output, [], {
+      verbose
+    });
+  }
+  let summary = null;
+  switch (toolName) {
+    case "navigate":
+      summary = "Navigation completed";
+      break;
+    case "tabs_create_mcp":
+      summary = "Tab created";
+      break;
+    case "tabs_context_mcp":
+      summary = "Tabs read";
+      break;
+    case "form_input":
+      summary = "Input completed";
+      break;
+    case "computer":
+      summary = "Action completed";
+      break;
+    case "resize_window":
+      summary = "Window resized";
+      break;
+    case "find":
+      summary = "Search completed";
+      break;
+    case "gif_creator":
+      summary = "GIF action completed";
+      break;
+    case "read_console_messages":
+      summary = "Console messages retrieved";
+      break;
+    case "read_network_requests":
+      summary = "Network requests retrieved";
+      break;
+    case "shortcuts_list":
+      summary = "Shortcuts retrieved";
+      break;
+    case "shortcuts_execute":
+      summary = "Shortcut executed";
+      break;
+    case "javascript_tool":
+      summary = "Script executed";
+      break;
+    case "read_page":
+      summary = "Page read";
+      break;
+    case "upload_image":
+      summary = "Image uploaded";
+      break;
+    case "get_page_text":
+      summary = "Page text retrieved";
+      break;
+    case "update_plan":
+      summary = "Plan updated";
+      break;
+  }
+  if (summary) {
+    return /* @__PURE__ */ jsx(MessageResponse, { height: 1, children: /* @__PURE__ */ jsx(Text, { dimColor: true, children: summary }) });
+  }
+  return null;
+}
+function getClaudeInChromeMCPToolOverrides(toolName) {
+  return {
+    userFacingName(_input) {
+      const displayName = toolName.replace(/_mcp$/, "");
+      return `Claude in Chrome[${displayName}]`;
+    },
+    renderToolUseMessage(input, {
+      verbose
+    }) {
+      return renderChromeToolUseMessage(input, toolName, verbose);
+    },
+    renderToolUseTag(input) {
+      return renderChromeViewTabLink(input);
+    },
+    renderToolResultMessage(output, _progressMessagesForMessage, {
+      verbose
+    }) {
+      if (!isMCPToolResult(output)) {
+        return null;
+      }
+      return renderChromeToolResultMessage(output, toolName, verbose);
+    }
+  };
+}
+function isMCPToolResult(output) {
+  return typeof output === "object" && output !== null;
+}
+export {
+  getClaudeInChromeMCPToolOverrides,
+  renderChromeToolResultMessage
+};
