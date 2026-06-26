@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { chmod, copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -58,6 +58,26 @@ function transformRelativeExtensions(source, filePath) {
   })
 }
 
+function placeholderAssetContent(relativePath) {
+  if (relativePath.endsWith('.txt')) {
+    return `Missing reconstructed text asset: ${relativePath}\n`
+  }
+  return `# Placeholder ${relativePath}\n`
+}
+
+function transformTextAssetRequires(source, filePath) {
+  return source.replace(/require\((['"])(\.\.?\/[^'"]+\.(?:txt|md))\1\)/g, (match, quote, specifier) => {
+    const candidate = path.resolve(path.dirname(filePath), specifier)
+    const relativePath = path.relative(srcRoot, candidate).replaceAll(path.sep, '/')
+    if (relativePath.startsWith('..')) return match
+    const destination = path.join(outdir, 'src', relativePath)
+    const modulePath = `${destination}.js`
+    let relative = path.relative(path.dirname(path.join(outdir, path.relative(root, filePath)).replace(/\.(ts|tsx|jsx)$/, '.js')), modulePath).replaceAll(path.sep, '/')
+    if (!relative.startsWith('.')) relative = `./${relative}`
+    return `require(${quote}${relative}${quote})`
+  })
+}
+
 function transformCommonJsRequires(source) {
   if (!/\brequire\s*\(/.test(source)) return source
   const shim = "import { createRequire as __createRequire } from 'node:module'\nconst require = __createRequire(import.meta.url)\n"
@@ -70,7 +90,7 @@ function transformCommonJsRequires(source) {
 }
 
 function transformSource(source, filePath) {
-  return transformCommonJsRequires(transformRelativeExtensions(transformTypeDeclarationSideEffects(transformSrcAliases(transformFeatures(source), filePath)), filePath))
+  return transformCommonJsRequires(transformTextAssetRequires(transformRelativeExtensions(transformTypeDeclarationSideEffects(transformSrcAliases(transformFeatures(source), filePath)), filePath), filePath))
 }
 
 function resolveSourcePath(candidate) {
@@ -99,6 +119,10 @@ function sourceAssetPlaceholders() {
     'skills/bundled/verify/SKILL.md',
     'skills/bundled/verify/examples/cli.md',
     'skills/bundled/verify/examples/server.md',
+    'utils/ultraplan/prompt.txt',
+    'utils/permissions/yolo-classifier-prompts/auto_mode_system_prompt.txt',
+    'utils/permissions/yolo-classifier-prompts/permissions_external.txt',
+    'utils/permissions/yolo-classifier-prompts/permissions_anthropic.txt',
   ]
 
   for (const rel of [
@@ -166,6 +190,21 @@ async function copySourceAssets(dir) {
         await writeFile(`${destination}.js`, `export default ${JSON.stringify(await readFile(fullPath, 'utf8'))}\n`)
       }
     }
+  }
+
+  for (const rel of sourceAssetPlaceholders()) {
+    const source = path.join(srcRoot, rel)
+    const destination = path.join(outdir, 'src', rel)
+    await mkdir(path.dirname(destination), { recursive: true })
+    const contents = existsSync(source)
+      ? await readFile(source, 'utf8')
+      : placeholderAssetContent(rel)
+    if (existsSync(source)) {
+      await copyFile(source, destination)
+    } else {
+      await writeFile(destination, contents)
+    }
+    await writeFile(`${destination}.js`, `export default ${JSON.stringify(contents)}\n`)
   }
 
   if (dir === path.join(srcRoot, 'skills', 'bundled')) {

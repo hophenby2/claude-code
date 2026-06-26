@@ -1,1 +1,1 @@
-# Placeholder verify CLI example
+# Placeholder skills/bundled/verify/examples/cli.md
