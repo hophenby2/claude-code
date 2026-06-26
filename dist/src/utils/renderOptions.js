@@ -1,11 +1,15 @@
 import { openSync } from "fs";
 import { ReadStream } from "tty";
-import { isEnvTruthy } from "./envUtils.js";
+import { isEnvTruthy, isTuiSmokeTestMode } from "./envUtils.js";
 import { logError } from "./log.js";
 let cachedStdinOverride = null;
 function getStdinOverride() {
   if (cachedStdinOverride !== null) {
     return cachedStdinOverride;
+  }
+  if (isTuiSmokeTestMode()) {
+    cachedStdinOverride = void 0;
+    return void 0;
   }
   if (process.stdin.isTTY) {
     cachedStdinOverride = void 0;

@@ -16,6 +16,7 @@ import { useAppState, useAppStateStore } from "../state/AppState.js";
 import { isAgentSwarmsEnabled } from "../utils/agentSwarmsEnabled.js";
 import { generateProgressiveArgumentHint, parseArguments } from "../utils/argumentSubstitution.js";
 import { getShellCompletions } from "../utils/bash/shellCompletion.js";
+import { isBareMode, isTuiSmokeTestMode } from "../utils/envUtils.js";
 import { formatLogMetadata } from "../utils/format.js";
 import { getSessionIdFromLog, searchSessionsByCustomTitle } from "../utils/sessionStorage.js";
 import { applyCommandSuggestion, findMidInputSlashCommand, generateCommandSuggestions, getBestCommandMatch, isCommandInput } from "../utils/suggestions/commandSuggestions.js";
@@ -290,7 +291,7 @@ function useTypeahead({
     setMaxColumnWidth(void 0);
   }, [mcpResources, setSuggestionsState, setSuggestionType, setMaxColumnWidth, agents]);
   useEffect(() => {
-    if (true) {
+    if (!isTuiSmokeTestMode() && !isBareMode()) {
       startBackgroundCacheRefresh();
     }
     return onIndexBuildComplete(() => {

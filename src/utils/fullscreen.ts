@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process'
 import { getIsInteractive } from '../bootstrap/state.js'
 import { logForDebugging } from './debug.js'
-import { isEnvDefinedFalsy, isEnvTruthy } from './envUtils.js'
+import { isEnvDefinedFalsy, isEnvTruthy, isTuiSmokeTestMode } from './envUtils.js'
 import { execFileNoThrow } from './execFileNoThrow.js'
 
 let loggedTmuxCcDisable = false
@@ -110,6 +110,7 @@ export function _resetTmuxControlModeProbeForTesting(): void {
  * opt in).
  */
 export function isFullscreenEnvEnabled(): boolean {
+  if (isTuiSmokeTestMode()) return false
   // Explicit user opt-out always wins.
   if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER)) return false
   // Explicit opt-in overrides auto-detection (escape hatch).
@@ -138,6 +139,7 @@ export function isFullscreenEnvEnabled(): boolean {
  * disables alt-screen and virtualized scrollback.
  */
 export function isMouseTrackingEnabled(): boolean {
+  if (isTuiSmokeTestMode()) return false
   return !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_MOUSE)
 }
 

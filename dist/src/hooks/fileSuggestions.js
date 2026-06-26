@@ -14,6 +14,7 @@ import { logEvent } from "../services/analytics/index.js";
 import { getGlobalConfig } from "../utils/config.js";
 import { getCwd } from "../utils/cwd.js";
 import { logForDebugging } from "../utils/debug.js";
+import { isTuiSmokeTestMode } from "../utils/envUtils.js";
 import { errorMessage } from "../utils/errors.js";
 import { execFileNoThrowWithCwd } from "../utils/execFileNoThrow.js";
 import { getFsImplementation } from "../utils/fsOperations.js";
@@ -403,6 +404,7 @@ function findMatchingFiles(fileIndex2, partialPath) {
 }
 const REFRESH_THROTTLE_MS = 5e3;
 function startBackgroundCacheRefresh() {
+  if (isTuiSmokeTestMode()) return;
   if (fileListRefreshPromise) return;
   const indexMtime = getGitIndexMtime();
   if (fileIndex) {

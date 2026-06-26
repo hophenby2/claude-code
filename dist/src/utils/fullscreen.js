@@ -1,7 +1,7 @@
 import { spawnSync } from "child_process";
 import { getIsInteractive } from "../bootstrap/state.js";
 import { logForDebugging } from "./debug.js";
-import { isEnvDefinedFalsy, isEnvTruthy } from "./envUtils.js";
+import { isEnvDefinedFalsy, isEnvTruthy, isTuiSmokeTestMode } from "./envUtils.js";
 import { execFileNoThrow } from "./execFileNoThrow.js";
 let loggedTmuxCcDisable = false;
 let checkedTmuxMouseHint = false;
@@ -39,6 +39,7 @@ function _resetTmuxControlModeProbeForTesting() {
   loggedTmuxCcDisable = false;
 }
 function isFullscreenEnvEnabled() {
+  if (isTuiSmokeTestMode()) return false;
   if (isEnvDefinedFalsy(process.env.CLAUDE_CODE_NO_FLICKER)) return false;
   if (isEnvTruthy(process.env.CLAUDE_CODE_NO_FLICKER)) return true;
   if (isTmuxControlMode()) {
@@ -53,6 +54,7 @@ function isFullscreenEnvEnabled() {
   return process.env.USER_TYPE === "ant";
 }
 function isMouseTrackingEnabled() {
+  if (isTuiSmokeTestMode()) return false;
   return !isEnvTruthy(process.env.CLAUDE_CODE_DISABLE_MOUSE);
 }
 function isMouseClicksDisabled() {

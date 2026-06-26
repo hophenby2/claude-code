@@ -46,7 +46,7 @@ function execFileNoThrowWithCwd(file, args, {
   return new Promise((resolve) => {
     execa(file, args, {
       maxBuffer,
-      signal: abortSignal,
+      cancelSignal: abortSignal,
       timeout: finalTimeout,
       cwd: finalCwd,
       env: finalEnv,

@@ -1,7 +1,7 @@
 import { openSync } from 'fs'
 import { ReadStream } from 'tty'
 import type { RenderOptions } from '../ink.js'
-import { isEnvTruthy } from './envUtils.js'
+import { isEnvTruthy, isTuiSmokeTestMode } from './envUtils.js'
 import { logError } from './log.js'
 
 // Cached stdin override - computed once per process
@@ -16,6 +16,12 @@ function getStdinOverride(): ReadStream | undefined {
   // Return cached result if already computed
   if (cachedStdinOverride !== null) {
     return cachedStdinOverride
+  }
+
+  // Smoke tests must read from the harness-controlled stdin, not /dev/tty.
+  if (isTuiSmokeTestMode()) {
+    cachedStdinOverride = undefined
+    return undefined
   }
 
   // No override needed if stdin is already a TTY

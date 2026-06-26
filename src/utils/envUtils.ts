@@ -66,6 +66,14 @@ export function isBareMode(): boolean {
 }
 
 /**
+ * TUI smoke mode keeps real REPL rendering/input, but disables automation-hostile
+ * terminal behavior and startup side effects.
+ */
+export function isTuiSmokeTestMode(): boolean {
+  return isEnvTruthy(process.env.CLAUDE_CODE_TUI_TEST)
+}
+
+/**
  * Parses an array of environment variable strings into a key-value object
  * @param envVars Array of strings in KEY=VALUE format
  * @returns Object with key-value pairs

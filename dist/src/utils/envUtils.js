@@ -35,6 +35,9 @@ function isEnvDefinedFalsy(envVar) {
 function isBareMode() {
   return isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE) || process.argv.includes("--bare");
 }
+function isTuiSmokeTestMode() {
+  return isEnvTruthy(process.env.CLAUDE_CODE_TUI_TEST);
+}
 function parseEnvVars(rawEnvArgs) {
   const parsedEnv = {};
   if (rawEnvArgs) {
@@ -102,6 +105,7 @@ export {
   isEnvTruthy,
   isInProtectedNamespace,
   isRunningOnHomespace,
+  isTuiSmokeTestMode,
   parseEnvVars,
   shouldMaintainProjectWorkingDir
 };

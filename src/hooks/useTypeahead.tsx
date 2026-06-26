@@ -21,6 +21,7 @@ import type { InlineGhostText, PromptInputMode } from '../types/textInputTypes.j
 import { isAgentSwarmsEnabled } from '../utils/agentSwarmsEnabled.js';
 import { generateProgressiveArgumentHint, parseArguments } from '../utils/argumentSubstitution.js';
 import { getShellCompletions, type ShellCompletionType } from '../utils/bash/shellCompletion.js';
+import { isBareMode, isTuiSmokeTestMode } from '../utils/envUtils.js';
 import { formatLogMetadata } from '../utils/format.js';
 import { getSessionIdFromLog, searchSessionsByCustomTitle } from '../utils/sessionStorage.js';
 import { applyCommandSuggestion, findMidInputSlashCommand, generateCommandSuggestions, getBestCommandMatch, isCommandInput } from '../utils/suggestions/commandSuggestions.js';
@@ -493,7 +494,7 @@ export function useTypeahead({
   // subsequent tests in the shard. The subscriber still registers so
   // fileSuggestions tests that trigger a refresh directly work correctly.
   useEffect(() => {
-    if ("production" !== 'test') {
+    if ("production" !== 'test' && !isTuiSmokeTestMode() && !isBareMode()) {
       startBackgroundCacheRefresh();
     }
     return onIndexBuildComplete(() => {
