@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { readFile, stat } from "fs/promises";
 import { dirname } from "path";
@@ -290,12 +292,12 @@ import { initializeGrowthBook } from "../services/analytics/growthbook.js";
 import { errorMessage, toError } from "../utils/errors.js";
 import { sleep } from "../utils/sleep.js";
 import "../memdir/paths.js";
-const coordinatorModeModule = false ? null : null;
-const proactiveModule = false ? null : null;
-const cronSchedulerModule = false ? null : null;
-const cronJitterConfigModule = false ? null : null;
-const cronGate = false ? null : null;
-const extractMemoriesModule = false ? null : null;
+const coordinatorModeModule = false ? require2("../coordinator/coordinatorMode.js") : null;
+const proactiveModule = false ? require2("../proactive/index.js") : null;
+const cronSchedulerModule = false ? require2("../utils/cronScheduler.js") : null;
+const cronJitterConfigModule = false ? require2("../utils/cronJitterConfig.js") : null;
+const cronGate = false ? require2("../tools/ScheduleCronTool/prompt.js") : null;
+const extractMemoriesModule = false ? require2("../services/extractMemories/extractMemories.js") : null;
 const SHUTDOWN_TEAM_PROMPT = `<system-reminder>
 You are running in non-interactive mode and cannot return a response to the user until your team is shut down.
 
@@ -1775,7 +1777,7 @@ ${m.text}
     }
   };
   if (false) {
-    const { setOnEnqueue } = null;
+    const { setOnEnqueue } = require2("../utils/udsMessaging.js");
     setOnEnqueue(() => {
       if (!inputClosed) {
         void run();
@@ -3334,7 +3336,7 @@ async function loadInitialMessages(setAppState, options) {
               getActiveAgentsFromList
             } = (
               // eslint-disable-next-line @typescript-eslint/no-require-imports
-              null
+              require2("../tools/AgentTool/loadAgentsDir.js")
             );
             getAgentDefinitionsWithOverrides.cache.clear?.();
             const freshAgentDefs = await getAgentDefinitionsWithOverrides(
@@ -3486,7 +3488,7 @@ async function loadInitialMessages(setAppState, options) {
           process.stderr.write(warning + "\n");
           const { getAgentDefinitionsWithOverrides, getActiveAgentsFromList } = (
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            null
+            require2("../tools/AgentTool/loadAgentsDir.js")
           );
           getAgentDefinitionsWithOverrides.cache.clear?.();
           const freshAgentDefs = await getAgentDefinitionsWithOverrides(

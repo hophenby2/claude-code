@@ -1875,7 +1875,7 @@ function generateHtmlReport(data, insights) {
 </html>`;
 }
 function buildExportData(data, insights, facets, remoteStats) {
-  const version = typeof MACRO !== "undefined" ? "0.0.0-dev" : "unknown";
+  const version = typeof MACRO !== "undefined" ? "0.0.0" : "unknown";
   const remote_hosts_collected = remoteStats?.hosts.filter((h) => h.sessionCount > 0).map((h) => h.name);
   const facets_summary = {
     total: facets.size,

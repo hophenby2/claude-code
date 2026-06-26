@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { randomUUID } from "crypto";
 import { BashTool } from "../tools/BashTool/BashTool.js";
 import { logForDebugging } from "./debug.js";
@@ -10,7 +12,7 @@ const getPowerShellTool = /* @__PURE__ */ (() => {
   let cached;
   return () => {
     if (!cached) {
-      cached = require("../tools/PowerShellTool/PowerShellTool.js").PowerShellTool;
+      cached = require2("../tools/PowerShellTool/PowerShellTool.js").PowerShellTool;
     }
     return cached;
   };

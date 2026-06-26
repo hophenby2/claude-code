@@ -1545,7 +1545,7 @@ This can be changed later or explicitly set with --spawn=same-dir or --spawn=wor
   const api = createBridgeApiClient({
     baseUrl,
     getAccessToken: getBridgeAccessToken,
-    runnerVersion: "0.0.0-dev",
+    runnerVersion: "0.0.0",
     onDebug: logForDebugging,
     onAuth401: handleOAuth401Error,
     getTrustedDeviceToken
@@ -1914,7 +1914,7 @@ async function runBridgeHeadless(opts, signal) {
   const api = createBridgeApiClient({
     baseUrl,
     getAccessToken: opts.getAccessToken,
-    runnerVersion: "0.0.0-dev",
+    runnerVersion: "0.0.0",
     onDebug: log,
     onAuth401: opts.onAuth401,
     getTrustedDeviceToken

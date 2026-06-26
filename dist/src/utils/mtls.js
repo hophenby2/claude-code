@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { Agent as HttpsAgent } from "https";
 import memoize from "lodash-es/memoize.js";
 import { getCACertificates } from "./caCerts.js";
@@ -82,7 +84,7 @@ function getTLSFetchOptions() {
     return { tls: tlsConfig };
   }
   logForDebugging("TLS: Created undici agent with custom certificates");
-  const undiciMod = require("undici");
+  const undiciMod = require2("undici");
   const agent = new undiciMod.Agent({
     connect: {
       cert: tlsConfig.cert,

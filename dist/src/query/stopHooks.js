@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { getShortcutDisplay } from "../keybindings/shortcutFormat.js";
 import "../memdir/paths.js";
@@ -23,8 +25,8 @@ import {
 } from "../utils/messages.js";
 import { getTaskListId, listTasks } from "../utils/tasks.js";
 import { getAgentName, getTeamName, isTeammate } from "../utils/teammate.js";
-const extractMemoriesModule = false ? null : null;
-const jobClassifierModule = false ? null : null;
+const extractMemoriesModule = false ? require2("../services/extractMemories/extractMemories.js") : null;
+const jobClassifierModule = false ? require2("../jobs/classifier.js") : null;
 import { executeAutoDream } from "../services/autoDream/autoDream.js";
 import { executePromptSuggestion } from "../services/PromptSuggestion/promptSuggestion.js";
 import { isBareMode, isEnvDefinedFalsy } from "../utils/envUtils.js";

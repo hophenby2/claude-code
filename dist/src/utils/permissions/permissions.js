@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { APIUserAbortError } from "@anthropic-ai/sdk";
 import {
@@ -33,8 +35,8 @@ import {
   deletePermissionRuleFromSettings,
   shouldAllowManagedPermissionRulesOnly
 } from "./permissionsLoader.js";
-const classifierDecisionModule = false ? null : null;
-const autoModeStateModule = false ? null : null;
+const classifierDecisionModule = false ? require2("./classifierDecision.js") : null;
+const autoModeStateModule = false ? require2("./autoModeState.js") : null;
 import "../../bootstrap/state.js";
 import "../../services/analytics/growthbook.js";
 import {

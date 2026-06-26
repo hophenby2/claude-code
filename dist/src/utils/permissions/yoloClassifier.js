@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { mkdir, writeFile } from "fs/promises";
 import { dirname, join } from "path";
@@ -36,9 +38,9 @@ import { getClaudeTempDir } from "./filesystem.js";
 function txtRequire(mod) {
   return typeof mod === "string" ? mod : mod.default;
 }
-const BASE_PROMPT = false ? txtRequire(null) : "";
-const EXTERNAL_PERMISSIONS_TEMPLATE = false ? txtRequire(null) : "";
-const ANTHROPIC_PERMISSIONS_TEMPLATE = false ? txtRequire(null) : "";
+const BASE_PROMPT = false ? txtRequire(require2("./yolo-classifier-prompts/auto_mode_system_prompt.txt")) : "";
+const EXTERNAL_PERMISSIONS_TEMPLATE = false ? txtRequire(require2("./yolo-classifier-prompts/permissions_external.txt")) : "";
+const ANTHROPIC_PERMISSIONS_TEMPLATE = false ? txtRequire(require2("./yolo-classifier-prompts/permissions_anthropic.txt")) : "";
 function isUsingExternalPermissions() {
   if (process.env.USER_TYPE !== "ant") return true;
   const config = getFeatureValue_CACHED_MAY_BE_STALE(

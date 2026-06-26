@@ -35,7 +35,7 @@ function WelcomeV2() {
         ] }),
         /* @__PURE__ */ jsxs(Text, { dimColor: true, children: [
           "v",
-          "0.0.0-dev",
+          "0.0.0",
           " "
         ] })
       ] });
@@ -169,7 +169,7 @@ function WelcomeV2() {
       ] }),
       /* @__PURE__ */ jsxs(Text, { dimColor: true, children: [
         "v",
-        "0.0.0-dev",
+        "0.0.0",
         " "
       ] })
     ] });
@@ -319,7 +319,7 @@ function AppleTerminalWelcomeV2(t0) {
     if ($[2] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
       t22 = /* @__PURE__ */ jsxs(Text, { dimColor: true, children: [
         "v",
-        "0.0.0-dev",
+        "0.0.0",
         " "
       ] });
       $[2] = t22;
@@ -489,7 +489,7 @@ function AppleTerminalWelcomeV2(t0) {
   if ($[24] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
     t2 = /* @__PURE__ */ jsxs(Text, { dimColor: true, children: [
       "v",
-      "0.0.0-dev",
+      "0.0.0",
       " "
     ] });
     $[24] = t2;

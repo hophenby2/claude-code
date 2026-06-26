@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { randomUUID } from "crypto";
 import { BashModeProgress } from "../../components/BashModeProgress.js";
 import { BashTool } from "../../tools/BashTool/BashTool.js";
@@ -45,7 +47,7 @@ async function processBashCommand(inputString, precedingInputBlocks, attachmentM
     };
     let PowerShellTool = null;
     if (usePowerShell) {
-      PowerShellTool = require("../../tools/PowerShellTool/PowerShellTool.js").PowerShellTool;
+      PowerShellTool = require2("../../tools/PowerShellTool/PowerShellTool.js").PowerShellTool;
     }
     const shellTool = PowerShellTool ?? BashTool;
     const response = PowerShellTool ? await PowerShellTool.call({

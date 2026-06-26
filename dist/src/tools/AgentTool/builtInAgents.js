@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { getIsNonInteractiveSession } from "../../bootstrap/state.js";
 import "../../services/analytics/growthbook.js";
@@ -20,7 +22,7 @@ function getBuiltInAgents() {
   }
   if (false) {
     if (isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE)) {
-      const { getCoordinatorAgents } = null;
+      const { getCoordinatorAgents } = require2("../../coordinator/workerAgent.js");
       return getCoordinatorAgents();
     }
   }

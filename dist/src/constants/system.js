@@ -38,7 +38,7 @@ function getAttributionHeader(fingerprint) {
   if (!isAttributionHeaderEnabled()) {
     return "";
   }
-  const version = `${"0.0.0-dev"}.${fingerprint}`;
+  const version = `${"0.0.0"}.${fingerprint}`;
   const entrypoint = process.env.CLAUDE_CODE_ENTRYPOINT ?? "unknown";
   const cch = false ? " cch=00000;" : "";
   const workload = getWorkload();

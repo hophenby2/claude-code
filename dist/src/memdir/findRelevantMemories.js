@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { logForDebugging } from "../utils/debug.js";
 import { errorMessage } from "../utils/errors.js";
@@ -31,7 +33,7 @@ async function findRelevantMemories(query, memoryDir, signal, recentTools = [], 
   const byFilename = new Map(memories.map((m) => [m.filename, m]));
   const selected = selectedFilenames.map((filename) => byFilename.get(filename)).filter((m) => m !== void 0);
   if (false) {
-    const { logMemoryRecallShape } = null;
+    const { logMemoryRecallShape } = require2("./memoryShapeTelemetry.js");
     logMemoryRecallShape(memories, selected);
   }
   return selected.map((m) => ({ path: m.filePath, mtimeMs: m.mtimeMs }));

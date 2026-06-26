@@ -1,7 +1,9 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 let _npmSemver;
 function getNpmSemver() {
   if (!_npmSemver) {
-    _npmSemver = require("semver");
+    _npmSemver = require2("semver");
   }
   return _npmSemver;
 }

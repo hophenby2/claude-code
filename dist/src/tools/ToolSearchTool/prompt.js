@@ -1,9 +1,11 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import "../../bootstrap/state.js";
 import { getFeatureValue_CACHED_MAY_BE_STALE } from "../../services/analytics/growthbook.js";
 import "../AgentTool/constants.js";
-const BRIEF_TOOL_NAME = false ? null.BRIEF_TOOL_NAME : null;
-const SEND_USER_FILE_TOOL_NAME = false ? null.SEND_USER_FILE_TOOL_NAME : null;
+const BRIEF_TOOL_NAME = false ? require2("../BriefTool/prompt.js").BRIEF_TOOL_NAME : null;
+const SEND_USER_FILE_TOOL_NAME = false ? require2("../SendUserFileTool/prompt.js").SEND_USER_FILE_TOOL_NAME : null;
 import { TOOL_SEARCH_TOOL_NAME } from "./constants.js";
 import { TOOL_SEARCH_TOOL_NAME as TOOL_SEARCH_TOOL_NAME2 } from "./constants.js";
 const PROMPT_HEAD = `Fetches full schema definitions for deferred tools so they can be called.
@@ -26,7 +28,7 @@ function isDeferredTool(tool) {
   if (tool.isMcp === true) return true;
   if (tool.name === TOOL_SEARCH_TOOL_NAME2) return false;
   if (false) {
-    const m = null;
+    const m = require2("../AgentTool/forkSubagent.js");
     if (m.isForkSubagentEnabled()) return false;
   }
   if (false) {

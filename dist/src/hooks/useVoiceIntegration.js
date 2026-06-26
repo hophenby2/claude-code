@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNotifications } from "../context/notifications.js";
@@ -9,7 +11,7 @@ import { useOptionalKeybindingContext } from "../keybindings/KeybindingContext.j
 import { keystrokesEqual } from "../keybindings/resolver.js";
 import { normalizeFullWidthSpace } from "../utils/stringUtils.js";
 import "./useVoiceEnabled.js";
-const voiceNs = false ? null : {
+const voiceNs = false ? require2("./useVoice.js") : {
   useVoice: ({
     enabled: _e
   }) => ({

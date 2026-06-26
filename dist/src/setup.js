@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import chalk from "chalk";
 import {
@@ -201,7 +203,7 @@ To attach: ${chalk.bold(`tmux attach -t ${tmuxSessionName}`)}`
     initSessionMemory();
     if (false) {
       ;
-      null.initContextCollapse();
+      require2("./services/contextCollapse/index.js").initContextCollapse();
     }
   }
   void lockCurrentVersion();

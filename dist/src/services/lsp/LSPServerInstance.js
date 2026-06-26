@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import * as path from "path";
 import { pathToFileURL } from "url";
 import { getCwd } from "../../utils/cwd.js";
@@ -19,7 +21,7 @@ function createLSPServerInstance(name, config) {
       `LSP server '${name}': shutdownTimeout is not yet implemented. Remove this field from the configuration.`
     );
   }
-  const { createLSPClient } = require("./LSPClient.js");
+  const { createLSPClient } = require2("./LSPClient.js");
   let state = "stopped";
   let startTime;
   let lastError;

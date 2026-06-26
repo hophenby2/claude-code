@@ -1,7 +1,9 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
-const coordinatorModule = false ? null : void 0;
+const coordinatorModule = false ? require2("../../coordinator/coordinatorMode.js") : void 0;
 import { Box, Text, Link } from "../../ink.js";
 import figures from "figures";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
@@ -35,7 +37,7 @@ import { useHasSelection, useSelection } from "../../ink/hooks/use-selection.js"
 import { getGlobalConfig } from "../../utils/config.js";
 import { getPlatform } from "../../utils/platform.js";
 import { PrBadge } from "../PrBadge.js";
-const proactiveModule = false ? null : null;
+const proactiveModule = false ? require2("../../proactive/index.js") : null;
 const NO_OP_SUBSCRIBE = (_cb) => () => {
 };
 const NULL = () => null;

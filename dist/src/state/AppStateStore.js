@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { shouldEnablePromptSuggestion } from "../services/PromptSuggestion/promptSuggestion.js";
 import {
   getEmptyToolPermissionContext
@@ -9,7 +11,7 @@ import { getInitialSettings } from "../utils/settings/settings.js";
 import { shouldEnableThinkingByDefault } from "../utils/thinking.js";
 const IDLE_SPECULATION_STATE = { status: "idle" };
 function getDefaultAppState() {
-  const teammateUtils = require("../utils/teammate.js");
+  const teammateUtils = require2("../utils/teammate.js");
   const initialMode = teammateUtils.isTeammate() && teammateUtils.isPlanModeRequired() ? "plan" : "default";
   return {
     settings: getInitialSettings(),

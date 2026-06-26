@@ -43,14 +43,16 @@ var __callDispose = (stack, error, hasError) => {
   };
   return next();
 };
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { FallbackTriggeredError } from "./services/api/withRetry.js";
 import {
   calculateTokenWarningState,
   isAutoCompactEnabled
 } from "./services/compact/autoCompact.js";
 import { buildPostCompactMessages } from "./services/compact/compact.js";
-const reactiveCompact = false ? null : null;
-const contextCollapse = false ? null : null;
+const reactiveCompact = false ? require2("./services/compact/reactiveCompact.js") : null;
+const contextCollapse = false ? require2("./services/contextCollapse/index.js") : null;
 import {
   logEvent
 } from "./services/analytics/index.js";
@@ -82,8 +84,8 @@ import {
   getAttachmentMessages,
   startRelevantMemoryPrefetch
 } from "./utils/attachments.js";
-const skillPrefetch = false ? null : null;
-const jobClassifier = false ? null : null;
+const skillPrefetch = false ? require2("./services/skillSearch/prefetch.js") : null;
+const jobClassifier = false ? require2("./jobs/classifier.js") : null;
 import {
   remove as removeFromQueue,
   getCommandsByMaxPriority,
@@ -118,8 +120,8 @@ const feature = (_name) => false;
 import "./bootstrap/state.js";
 import "./query/tokenBudget.js";
 import { count } from "./utils/array.js";
-const snipModule = false ? null : null;
-const taskSummaryModule = false ? null : null;
+const snipModule = false ? require2("./services/compact/snipCompact.js") : null;
+const taskSummaryModule = false ? require2("./utils/taskSummary.js") : null;
 function* yieldMissingToolResultBlocks(assistantMessages, errorMessage) {
   for (const assistantMessage of assistantMessages) {
     const toolUseBlocks = assistantMessage.message.content.filter(

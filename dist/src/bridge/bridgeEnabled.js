@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import "../services/analytics/growthbook.js";
 import * as authModule from "../utils/auth.js";
@@ -60,8 +62,8 @@ function isCseShimEnabled() {
 function checkBridgeMinVersion() {
   if (false) {
     const config = getDynamicConfig_CACHED_MAY_BE_STALE("tengu_bridge_min_version", { minVersion: "0.0.0" });
-    if (config.minVersion && lt("0.0.0-dev", config.minVersion)) {
-      return `Your version of Claude Code (${"0.0.0-dev"}) is too old for Remote Control.
+    if (config.minVersion && lt("0.0.0", config.minVersion)) {
+      return `Your version of Claude Code (${"0.0.0"}) is too old for Remote Control.
 Version ${config.minVersion} or higher is required. Run \`claude update\` to update.`;
     }
   }

@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { Box, Text, useTheme, useThemeSetting, useTerminalFocus } from "../../ink.js";
@@ -83,7 +85,7 @@ function Config({
   const isFastMode = useAppState((s_2) => isFastModeEnabled() ? s_2.fastMode : false);
   const promptSuggestionEnabled = useAppState((s_3) => s_3.promptSuggestionEnabled);
   const showAutoInDefaultModePicker = false ? hasAutoModeOptInAnySource() || getAutoModeEnabledState() === "enabled" : false;
-  const showDefaultViewPicker = false ? null.isBriefEntitled() : false;
+  const showDefaultViewPicker = false ? require2("../../tools/BriefTool/BriefTool.js").isBriefEntitled() : false;
   const setAppState = useSetAppState();
   const [changes, setChanges] = useState({});
   const initialThinkingEnabled = React.useRef(thinkingEnabled);
@@ -1474,7 +1476,7 @@ function Config({
     logEvent("tengu_autoupdate_enabled", {
       channel
     });
-  } }) }) : showSubmenu === "ChannelDowngrade" ? /* @__PURE__ */ jsx(ChannelDowngradeDialog, { currentVersion: "0.0.0-dev", onChoice: (choice) => {
+  } }) }) : showSubmenu === "ChannelDowngrade" ? /* @__PURE__ */ jsx(ChannelDowngradeDialog, { currentVersion: "0.0.0", onChoice: (choice) => {
     setShowSubmenu(null);
     setTabsHidden(false);
     if (choice === "cancel") {
@@ -1485,7 +1487,7 @@ function Config({
       autoUpdatesChannel: "stable"
     };
     if (choice === "stay") {
-      newSettings.minimumVersion = "0.0.0-dev";
+      newSettings.minimumVersion = "0.0.0";
     }
     updateSettingsForSource("userSettings", newSettings);
     setSettingsData((prev_27) => ({

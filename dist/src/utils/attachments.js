@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import {
   logEvent
 } from "../services/analytics/index.js";
@@ -53,10 +55,10 @@ import { getProjectRoot } from "../bootstrap/state.js";
 import { formatCommandsWithinBudget } from "../tools/SkillTool/prompt.js";
 import { getContextWindowForModel } from "./context.js";
 const skillSearchModules = false ? {
-  featureCheck: null,
-  prefetch: null
+  featureCheck: require2("../services/skillSearch/featureCheck.js"),
+  prefetch: require2("../services/skillSearch/prefetch.js")
 } : null;
-const autoModeStateModule = false ? null : null;
+const autoModeStateModule = false ? require2("./permissions/autoModeState.js") : null;
 import {
   MAX_LINES_TO_READ,
   FILE_READ_TOOL_NAME
@@ -135,8 +137,8 @@ import {
 import { isHumanTurn } from "./messagePredicates.js";
 import { isEnvTruthy, getClaudeConfigHomeDir } from "./envUtils.js";
 const feature = (_name) => false;
-const BRIEF_TOOL_NAME = false ? null.BRIEF_TOOL_NAME : null;
-const sessionTranscriptModule = false ? null : null;
+const BRIEF_TOOL_NAME = false ? require2("../tools/BriefTool/prompt.js").BRIEF_TOOL_NAME : null;
+const sessionTranscriptModule = false ? require2("../services/sessionTranscript/sessionTranscript.js") : null;
 import { hasUltrathinkKeyword, isUltrathinkEnabled } from "./thinking.js";
 import {
   tokenCountFromLastAPIResponse,
@@ -2185,7 +2187,7 @@ function getContextEfficiencyAttachment(messages) {
   }
   const { isSnipRuntimeEnabled, shouldNudgeForSnips } = (
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require("../services/compact/snipCompact.js")
+    require2("../services/compact/snipCompact.js")
   );
   if (!isSnipRuntimeEnabled()) {
     return [];

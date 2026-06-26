@@ -69,7 +69,7 @@ function appendToLog(path, message) {
     cwd: getFsImplementation().cwd(),
     userType: process.env.USER_TYPE,
     sessionId: getSessionId(),
-    version: "0.0.0-dev"
+    version: "0.0.0"
   };
   getLogWriter(path).write(messageWithTimestamp);
 }

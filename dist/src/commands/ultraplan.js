@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import "fs";
 import { REMOTE_CONTROL_DISCONNECTED_MSG } from "../bridge/types.js";
 import { DIAMOND_OPEN } from "../constants/figures.js";
@@ -18,7 +20,7 @@ const CCR_TERMS_URL = "https://code.claude.com/docs/en/claude-code-on-the-web";
 function getUltraplanModel() {
   return getFeatureValue_CACHED_MAY_BE_STALE("tengu_ultraplan_model", ALL_MODEL_CONFIGS.opus46.firstParty);
 }
-const _rawPrompt = require("../utils/ultraplan/prompt.txt");
+const _rawPrompt = require2("../utils/ultraplan/prompt.txt");
 const DEFAULT_INSTRUCTIONS = (typeof _rawPrompt === "string" ? _rawPrompt : _rawPrompt.default).trimEnd();
 const ULTRAPLAN_INSTRUCTIONS = false ? readFileSync(process.env.ULTRAPLAN_PROMPT_FILE, "utf8").trimEnd() : DEFAULT_INSTRUCTIONS;
 function buildUltraplanPrompt(blurb, seedPlan) {

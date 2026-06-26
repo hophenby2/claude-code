@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 import { Box, Text, color } from "../../ink.js";
 import { useTerminalSize } from "../../hooks/useTerminalSize.js";
@@ -25,7 +27,7 @@ import { EmergencyTip } from "./EmergencyTip.js";
 import { VoiceModeNotice } from "./VoiceModeNotice.js";
 import { Opus1mMergeNotice } from "./Opus1mMergeNotice.js";
 const feature = (_name) => false;
-const ChannelsNoticeModule = false ? null : null;
+const ChannelsNoticeModule = false ? require2("./ChannelsNotice.js") : null;
 import { SandboxManager } from "../../utils/sandbox/sandbox-adapter.js";
 import { useShowGuestPassesUpsell, incrementGuestPassesSeenCount } from "./GuestPassesUpsell.js";
 import { useShowOverageCreditUpsell, incrementOverageCreditUpsellSeenCount, createOverageCreditFeed } from "./OverageCreditUpsell.js";
@@ -82,7 +84,7 @@ function LogoV2() {
   if ($[2] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
     t2 = () => {
       const currentConfig = getGlobalConfig();
-      if (currentConfig.lastReleaseNotesSeen === "0.0.0-dev") {
+      if (currentConfig.lastReleaseNotesSeen === "0.0.0") {
         return;
       }
       saveGlobalConfig(_temp3);
@@ -606,12 +608,12 @@ function LogoV2() {
   return t41;
 }
 function _temp3(current) {
-  if (current.lastReleaseNotesSeen === "0.0.0-dev") {
+  if (current.lastReleaseNotesSeen === "0.0.0") {
     return current;
   }
   return {
     ...current,
-    lastReleaseNotesSeen: "0.0.0-dev"
+    lastReleaseNotesSeen: "0.0.0"
   };
 }
 function _temp2(s_0) {

@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { buildTool, toolMatchesName } from "../../Tool.js";
 import { getQuerySourceForAgent } from "../../utils/promptCategory.js";
@@ -50,7 +52,7 @@ import { filterAgentsByMcpRequirements, hasRequiredMcpServers, isBuiltInAgent } 
 import { getPrompt } from "./prompt.js";
 import { runAgent } from "./runAgent.js";
 import { renderGroupedAgentToolUse, renderToolResultMessage, renderToolUseErrorMessage, renderToolUseMessage, renderToolUseProgressMessage, renderToolUseRejectedMessage, renderToolUseTag, userFacingName, userFacingNameBackgroundColor } from "./UI.js";
-const proactiveModule = false ? null : null;
+const proactiveModule = false ? require2("../../proactive/index.js") : null;
 const PROGRESS_THRESHOLD_MS = 2e3;
 const isBackgroundTasksDisabled = (
   // eslint-disable-next-line custom-rules/no-process-env-top-level -- Intentional: schema must be defined at module load

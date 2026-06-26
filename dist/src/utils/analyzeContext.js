@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import {
   getSystemPrompt,
@@ -687,7 +689,7 @@ async function analyzeContextUsage(messages, model, getToolPermissionContext, to
     }
   }
   if (false) {
-    const { isContextCollapseEnabled } = null;
+    const { isContextCollapseEnabled } = require2("../services/contextCollapse/index.js");
     if (isContextCollapseEnabled()) {
       skipReservedBuffer = true;
     }

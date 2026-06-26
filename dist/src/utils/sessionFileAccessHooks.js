@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { registerHookCallbacks } from "../bootstrap/state.js";
 import {
@@ -18,9 +20,9 @@ import {
   detectSessionPatternType,
   isAutoMemFile
 } from "./memoryFileDetection.js";
-const teamMemPaths = false ? null : null;
-const teamMemWatcher = false ? null : null;
-const memoryShapeTelemetry = false ? null : null;
+const teamMemPaths = false ? require2("../memdir/teamMemPaths.js") : null;
+const teamMemWatcher = false ? require2("../services/teamMemorySync/watcher.js") : null;
+const memoryShapeTelemetry = false ? require2("../memdir/memoryShapeTelemetry.js") : null;
 import { getSubagentLogName } from "./agentContext.js";
 function getFilePathFromInput(toolName, toolInput) {
   switch (toolName) {

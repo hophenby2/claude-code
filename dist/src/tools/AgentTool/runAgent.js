@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomUUID } from "crypto";
 import uniqBy from "lodash-es/uniqBy.js";
@@ -491,7 +493,7 @@ async function* runAgent({
     });
     killShellTasksForAgent(agentId, toolUseContext.getAppState, rootSetAppState);
     if (false) {
-      const mcpMod = null;
+      const mcpMod = require2("../../tasks/MonitorMcpTask/MonitorMcpTask.js");
       mcpMod.killMonitorMcpTasksForAgent(
         agentId,
         toolUseContext.getAppState,

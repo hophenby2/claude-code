@@ -353,9 +353,9 @@ async function updateLatest(channelOrVersion, forceReinstall = false) {
       logForDebugging(
         `Native installer: maxVersion ${maxVersion} is set, capping update from ${version} to ${maxVersion}`
       );
-      if (gte("0.0.0-dev", maxVersion)) {
+      if (gte("0.0.0", maxVersion)) {
         logForDebugging(
-          `Native installer: current version ${"0.0.0-dev"} is already at or above maxVersion ${maxVersion}, skipping update`
+          `Native installer: current version ${"0.0.0"} is already at or above maxVersion ${maxVersion}, skipping update`
         );
         logEvent("tengu_native_update_skipped_max_version", {
           latency_ms: Date.now() - startTime,
@@ -367,7 +367,7 @@ async function updateLatest(channelOrVersion, forceReinstall = false) {
       version = maxVersion;
     }
   }
-  if (!forceReinstall && version === "0.0.0-dev" && await versionIsAvailable(version) && await isPossibleClaudeBinary(executablePath)) {
+  if (!forceReinstall && version === "0.0.0" && await versionIsAvailable(version) && await isPossibleClaudeBinary(executablePath)) {
     logForDebugging(`Found ${version} at ${executablePath}, skipping install`);
     logEvent("tengu_native_update_complete", {
       latency_ms: Date.now() - startTime,

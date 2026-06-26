@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import memoize from "lodash-es/memoize.js";
 import { homedir } from "os";
 import { join } from "path";
@@ -62,7 +64,7 @@ function isRunningOnHomespace() {
 }
 function isInProtectedNamespace() {
   if (process.env.USER_TYPE === "ant") {
-    return require("./protectedNamespace.js").checkProtectedNamespace();
+    return require2("./protectedNamespace.js").checkProtectedNamespace();
   }
   return false;
 }

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import { homedir } from "os";
 import { join } from "path";
@@ -136,7 +138,7 @@ async function readToken(path) {
 function setNonDumpable() {
   if (process.platform !== "linux" || typeof Bun === "undefined") return;
   try {
-    const ffi = require("bun:ffi");
+    const ffi = require2("bun:ffi");
     const lib = ffi.dlopen("libc.so.6", {
       prctl: {
         args: ["int", "u64", "u64", "u64", "u64"],

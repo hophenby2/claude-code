@@ -16,7 +16,7 @@ function buildPrimarySection() {
   const nameValue = customTitle ?? /* @__PURE__ */ jsx(Text, { dimColor: true, children: "/rename to add a name" });
   return [{
     label: "Version",
-    value: "0.0.0-dev"
+    value: "0.0.0"
   }, {
     label: "Session name",
     value: nameValue

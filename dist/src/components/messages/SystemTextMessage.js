@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 import { Box, Text } from "../../ink.js";
 const feature = (_name) => false;
@@ -10,7 +12,7 @@ import { basename } from "path";
 import { MessageResponse } from "../MessageResponse.js";
 import { FilePathLink } from "../FilePathLink.js";
 import { openPath } from "../../utils/browser.js";
-const teamMemSaved = false ? null : null;
+const teamMemSaved = false ? require2("./teamMemSaved.js") : null;
 import { TURN_COMPLETION_VERBS } from "../../constants/turnCompletionVerbs.js";
 import { useTerminalSize } from "../../hooks/useTerminalSize.js";
 import { SystemAPIErrorMessage } from "./SystemAPIErrorMessage.js";

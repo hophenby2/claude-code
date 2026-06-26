@@ -178,7 +178,7 @@ function initialize1PEventLogging() {
   const platform = getPlatform();
   const attributes = {
     [ATTR_SERVICE_NAME]: "claude-code",
-    [ATTR_SERVICE_VERSION]: "0.0.0-dev"
+    [ATTR_SERVICE_VERSION]: "0.0.0"
   };
   if (platform === "wsl") {
     const wslVersion = getWslVersion();
@@ -207,7 +207,7 @@ function initialize1PEventLogging() {
   });
   firstPartyEventLogger = firstPartyEventLoggerProvider.getLogger(
     "com.anthropic.claude_code.events",
-    "0.0.0-dev"
+    "0.0.0"
   );
 }
 async function reinitialize1PEventLoggingIfConfigChanged() {

@@ -1,4 +1,6 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { Box, Text } from "../ink.js";
@@ -20,7 +22,7 @@ function CollapseStatus() {
         const {
           getStats,
           isContextCollapseEnabled
-        } = null;
+        } = require2("../services/contextCollapse/index.js");
         if (!isContextCollapseEnabled()) {
           t1 = null;
           break bb0;

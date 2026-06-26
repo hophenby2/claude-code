@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { relative } from "path";
 import {
@@ -20,7 +22,7 @@ import {
 } from "./PermissionMode.js";
 import { applyPermissionRulesToPermissionContext } from "./permissions.js";
 import { loadAllPermissionRulesFromDisk } from "./permissionsLoader.js";
-const autoModeStateModule = false ? null : null;
+const autoModeStateModule = false ? require2("./autoModeState.js") : null;
 import { resolve } from "path";
 import {
   checkSecurityRestrictionGate,

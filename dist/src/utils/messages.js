@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomUUID } from "crypto";
 import isObject from "lodash-es/isObject.js";
@@ -85,7 +87,7 @@ import {
 import { escapeRegExp } from "./stringUtils.js";
 import { isTodoV2Enabled } from "./tasks.js";
 function getTeammateMailbox() {
-  return require("./teammateMailbox.js");
+  return require2("./teammateMailbox.js");
 }
 import {
   isToolReferenceBlock,
@@ -1384,7 +1386,7 @@ function normalizeMessagesForAPI(messages, tools = []) {
   if (false) {
     const { isSnipRuntimeEnabled } = (
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      null
+      require2("../services/compact/snipCompact.js")
     );
     if (isSnipRuntimeEnabled()) {
       for (let i = 0; i < sanitized.length; i++) {
@@ -1435,7 +1437,7 @@ function mergeUserMessages(a, b) {
   if (false) {
     const { isSnipRuntimeEnabled } = (
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      null
+      require2("../services/compact/snipCompact.js")
     );
     if (isSnipRuntimeEnabled()) {
       return {
@@ -2760,7 +2762,7 @@ You have exited auto mode. The user may now want to interact more directly. You 
       if (false) {
         const { SNIP_NUDGE_TEXT } = (
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          null
+          require2("../services/compact/snipCompact.js")
         );
         return wrapMessagesInSystemReminder([
           createUserMessage({
@@ -3132,7 +3134,7 @@ function getMessagesAfterCompactBoundary(messages, options) {
   const boundaryIndex = findLastCompactBoundaryIndex(messages);
   const sliced = boundaryIndex === -1 ? messages : messages.slice(boundaryIndex);
   if (!options?.includeSnipped && false) {
-    const { projectSnippedView } = null;
+    const { projectSnippedView } = require2("../services/compact/snipProjection.js");
     return projectSnippedView(sliced);
   }
   return sliced;

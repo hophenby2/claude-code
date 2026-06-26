@@ -70,7 +70,7 @@ function buildStatusLineCommandInput(permissionMode, exceeds200kTokens, settings
       project_dir: getOriginalCwd(),
       added_dirs: addedDirs
     },
-    version: "0.0.0-dev",
+    version: "0.0.0",
     output_style: {
       name: outputStyleName
     },

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { FlashingChar } from "./FlashingChar.js";
 import { GlimmerMessage } from "./GlimmerMessage.js";
 import { ShimmerChar } from "./ShimmerChar.js";

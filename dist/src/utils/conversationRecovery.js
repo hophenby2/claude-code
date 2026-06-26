@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { relative } from "path";
 import { getCwd } from "./cwd.js";
@@ -32,9 +34,9 @@ import {
   loadTranscriptFile,
   removeExtraFields
 } from "./sessionStorage.js";
-const BRIEF_TOOL_NAME = false ? null.BRIEF_TOOL_NAME : null;
-const LEGACY_BRIEF_TOOL_NAME = false ? null.LEGACY_BRIEF_TOOL_NAME : null;
-const SEND_USER_FILE_TOOL_NAME = false ? null.SEND_USER_FILE_TOOL_NAME : null;
+const BRIEF_TOOL_NAME = false ? require2("../tools/BriefTool/prompt.js").BRIEF_TOOL_NAME : null;
+const LEGACY_BRIEF_TOOL_NAME = false ? require2("../tools/BriefTool/prompt.js").LEGACY_BRIEF_TOOL_NAME : null;
+const SEND_USER_FILE_TOOL_NAME = false ? require2("../tools/SendUserFileTool/prompt.js").SEND_USER_FILE_TOOL_NAME : null;
 function migrateLegacyAttachmentTypes(message) {
   if (message.type !== "attachment") {
     return message;

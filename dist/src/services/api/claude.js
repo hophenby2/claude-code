@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { randomUUID } from "crypto";
 import {
   getAPIProvider,
@@ -61,7 +63,7 @@ import {
   extractQuotaStatusFromHeaders
 } from "../claudeAiLimits.js";
 import { getAPIContextManagement } from "../compact/apiMicrocompact.js";
-const autoModeStateModule = false ? null : null;
+const autoModeStateModule = false ? require2("../../utils/permissions/autoModeState.js") : null;
 const feature = (_name) => false;
 import {
   APIConnectionTimeoutError,

@@ -1,9 +1,11 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { diffArrays } from "diff";
 import { basename, extname } from "path";
 let cachedHljs = null;
 function hljs() {
   if (cachedHljs) return cachedHljs;
-  const mod = require("highlight.js");
+  const mod = require2("highlight.js");
   cachedHljs = "default" in mod && mod.default ? mod.default : mod;
   return cachedHljs;
 }

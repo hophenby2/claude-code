@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import {
   logEvent
@@ -6,7 +8,7 @@ import { isBuiltInAgent } from "../tools/AgentTool/loadAgentsDir.js";
 import "./envUtils.js";
 import { asSystemPrompt } from "./systemPromptType.js";
 import { asSystemPrompt as asSystemPrompt2 } from "./systemPromptType.js";
-const proactiveModule = false ? null : null;
+const proactiveModule = false ? require2("../proactive/index.js") : null;
 function isProactiveActive_SAFE_TO_CALL_ANYWHERE() {
   return proactiveModule?.isProactiveActive() ?? false;
 }
@@ -24,7 +26,7 @@ function buildEffectiveSystemPrompt({
   if (false) {
     const { getCoordinatorSystemPrompt } = (
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      null
+      require2("../coordinator/coordinatorMode.js")
     );
     return asSystemPrompt([
       getCoordinatorSystemPrompt(),

@@ -1,4 +1,6 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import chalk from "chalk";
@@ -24,7 +26,7 @@ import { projectIsInGitRepo } from "../../utils/memory/versions.js";
 import { updateSettingsForSource } from "../../utils/settings/settings.js";
 import { Select } from "../CustomSelect/index.js";
 import { ListItem } from "../design-system/ListItem.js";
-const teamMemPaths = false ? null : null;
+const teamMemPaths = false ? require2("../../memdir/teamMemPaths.js") : null;
 let lastSelectedPath;
 const OPEN_FOLDER_PREFIX = "__open_folder__";
 function MemoryFileSelector(t0) {

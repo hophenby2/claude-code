@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import figures from "figures";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -33,7 +35,7 @@ import { Select } from "../../CustomSelect/index.js";
 import { Markdown } from "../../Markdown.js";
 import { PermissionDialog } from "../PermissionDialog.js";
 import { PermissionRuleExplanation } from "../PermissionRuleExplanation.js";
-const autoModeStateModule = false ? null : null;
+const autoModeStateModule = false ? require2("../../../utils/permissions/autoModeState.js") : null;
 import { maybeResizeAndDownsampleImageBlock } from "../../../utils/imageResizer.js";
 import { cacheImagePath, storeImage } from "../../../utils/imageStore.js";
 function buildPermissionUpdates(mode, allowedPrompts) {

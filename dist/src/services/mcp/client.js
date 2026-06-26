@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import {
@@ -89,7 +91,7 @@ import {
 import { buildMcpToolName } from "./mcpStringUtils.js";
 import { normalizeNameForMCP } from "./normalization.js";
 import { getLoggingSafeMcpBaseUrl } from "./utils.js";
-const fetchMcpSkillsForClient = false ? null.fetchMcpSkillsForClient : null;
+const fetchMcpSkillsForClient = false ? require2("../../skills/mcpSkills.js").fetchMcpSkillsForClient : null;
 import { UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
 import { classifyMcpToolForCollapse } from "../../tools/MCPTool/classifyForCollapse.js";
 import { clearKeychainCache } from "../../utils/secureStorage/macOsKeychainHelpers.js";
@@ -138,9 +140,9 @@ function getMcpToolTimeoutMs() {
   return parseInt(process.env.MCP_TOOL_TIMEOUT || "", 10) || DEFAULT_MCP_TOOL_TIMEOUT_MS;
 }
 import { isClaudeInChromeMCPServer } from "../../utils/claudeInChrome/common.js";
-const claudeInChromeToolRendering = () => require("../../utils/claudeInChrome/toolRendering.js");
-const computerUseWrapper = false ? () => null : void 0;
-const isComputerUseMCPServer = false ? null.isComputerUseMCPServer : void 0;
+const claudeInChromeToolRendering = () => require2("../../utils/claudeInChrome/toolRendering.js");
+const computerUseWrapper = false ? () => require2("../../utils/computerUse/wrapper.js") : void 0;
+const isComputerUseMCPServer = false ? require2("../../utils/computerUse/common.js").isComputerUseMCPServer : void 0;
 import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import { dirname, join } from "path";
 import { getClaudeConfigHomeDir } from "../../utils/envUtils.js";
@@ -596,7 +598,7 @@ const connectToServer = memoize(
         {
           name: "claude-code",
           title: "Claude Code",
-          version: "0.0.0-dev",
+          version: "0.0.0",
           description: "Anthropic's agentic coding tool",
           websiteUrl: PRODUCT_URL
         },
@@ -2188,7 +2190,7 @@ async function setupSdkMcpClients(sdkMcpConfigs, sendMcpMessage) {
         {
           name: "claude-code",
           title: "Claude Code",
-          version: "0.0.0-dev",
+          version: "0.0.0",
           description: "Anthropic's agentic coding tool",
           websiteUrl: PRODUCT_URL
         },

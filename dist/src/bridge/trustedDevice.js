@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import axios from "axios";
 import memoize from "lodash-es/memoize.js";
 import { hostname } from "os";
@@ -60,7 +62,7 @@ async function enrollTrustedDevice() {
       );
       return;
     }
-    const { getClaudeAIOAuthTokens } = require("../utils/auth.js");
+    const { getClaudeAIOAuthTokens } = require2("../utils/auth.js");
     const accessToken = getClaudeAIOAuthTokens()?.accessToken;
     if (!accessToken) {
       logForDebugging("[trusted-device] No OAuth token, skipping enrollment");

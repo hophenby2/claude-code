@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { NO_CONTENT_MESSAGE } from "../../constants/messages.js";
@@ -85,7 +87,7 @@ function UserTextMessage(t0) {
     if (param.text.startsWith("<github-webhook-activity>")) {
       let t12;
       if ($[9] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-        t12 = null;
+        t12 = require2("./UserGitHubWebhookMessage.js");
         $[9] = t12;
       } else {
         t12 = $[9];
@@ -182,7 +184,7 @@ function UserTextMessage(t0) {
     if (param.text.includes("<fork-boilerplate>")) {
       let t12;
       if ($[32] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-        t12 = null;
+        t12 = require2("./UserForkBoilerplateMessage.js");
         $[32] = t12;
       } else {
         t12 = $[32];
@@ -206,7 +208,7 @@ function UserTextMessage(t0) {
     if (param.text.includes("<cross-session-message")) {
       let t12;
       if ($[36] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-        t12 = null;
+        t12 = require2("./UserCrossSessionMessage.js");
         $[36] = t12;
       } else {
         t12 = $[36];
@@ -230,7 +232,7 @@ function UserTextMessage(t0) {
     if (param.text.includes('<channel source="')) {
       let t12;
       if ($[40] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-        t12 = null;
+        t12 = require2("./UserChannelMessage.js");
         $[40] = t12;
       } else {
         t12 = $[40];

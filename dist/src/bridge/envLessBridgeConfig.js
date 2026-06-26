@@ -66,8 +66,8 @@ async function getEnvLessBridgeConfig() {
 }
 async function checkEnvLessBridgeMinVersion() {
   const cfg = await getEnvLessBridgeConfig();
-  if (cfg.min_version && lt("0.0.0-dev", cfg.min_version)) {
-    return `Your version of Claude Code (${"0.0.0-dev"}) is too old for Remote Control.
+  if (cfg.min_version && lt("0.0.0", cfg.min_version)) {
+    return `Your version of Claude Code (${"0.0.0"}) is too old for Remote Control.
 Version ${cfg.min_version} or higher is required. Run \`claude update\` to update.`;
   }
   return null;

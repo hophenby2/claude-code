@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { writeFile } from "fs/promises";
 import { z } from "zod/v4";
@@ -42,8 +44,8 @@ import {
   renderToolUseMessage,
   renderToolUseRejectedMessage
 } from "./UI.js";
-const autoModeStateModule = false ? null : null;
-const permissionSetupModule = false ? null : null;
+const autoModeStateModule = false ? require2("../../utils/permissions/autoModeState.js") : null;
+const permissionSetupModule = false ? require2("../../utils/permissions/permissionSetup.js") : null;
 const allowedPromptSchema = lazySchema(
   () => z.object({
     tool: z.enum(["Bash"]).describe("The tool this prompt applies to"),

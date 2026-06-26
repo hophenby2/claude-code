@@ -1,4 +1,6 @@
-const workerAgent = {};
+function getCoordinatorAgents() {
+  return [];
+}
 export {
-  workerAgent
+  getCoordinatorAgents
 };

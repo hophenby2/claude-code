@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { z } from "zod/v4";
 import "../../bootstrap/state.js";
@@ -563,7 +565,7 @@ const SendMessageTool = buildTool({
             }
           };
         }
-        const { postInterClaudeMessage } = null;
+        const { postInterClaudeMessage } = require2("../../bridge/peerSessions.js");
         const result = await postInterClaudeMessage(
           addr.target,
           input.message
@@ -577,7 +579,7 @@ const SendMessageTool = buildTool({
         };
       }
       if (addr.scheme === "uds") {
-        const { sendToUdsSocket } = null;
+        const { sendToUdsSocket } = require2("../../utils/udsClient.js");
         try {
           await sendToUdsSocket(addr.target, input.message);
           const preview = input.summary || truncate(input.message, 50);

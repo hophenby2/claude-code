@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { extname } from "path";
 import memoize from "lodash-es/memoize.js";
 import { env, getHostPlatformForAnalytics } from "../../utils/env.js";
@@ -51,7 +53,7 @@ function isAnalyticsToolDetailsLoggingEnabled(mcpServerType, mcpServerBaseUrl) {
 }
 const BUILTIN_MCP_SERVER_NAMES = new Set(
   false ? [
-    null.COMPUTER_USE_MCP_SERVER_NAME
+    require2("../../utils/computerUse/common.js").COMPUTER_USE_MCP_SERVER_NAME
   ] : []
 );
 function mcpToolDetailsForAnalytics(toolName, mcpServerType, mcpServerBaseUrl) {
@@ -238,7 +240,7 @@ function getAgentIdentification() {
   return {};
 }
 const getVersionBase = memoize(() => {
-  const match = "0.0.0-dev".match(/^\d+\.\d+\.\d+(?:-[a-z]+)?/);
+  const match = "0.0.0".match(/^\d+\.\d+\.\d+(?:-[a-z]+)?/);
   return match ? match[0] : void 0;
 });
 const buildEnvContext = memoize(async () => {
@@ -282,7 +284,7 @@ const buildEnvContext = memoize(async () => {
     isGithubAction: isEnvTruthy(process.env.GITHUB_ACTIONS),
     isClaudeCodeAction: isEnvTruthy(process.env.CLAUDE_CODE_ACTION),
     isClaudeAiAuth: isClaudeAISubscriber(),
-    version: "0.0.0-dev",
+    version: "0.0.0",
     versionBase: getVersionBase(),
     buildTime: "dev",
     deploymentEnvironment: env.detectDeploymentEnvironment(),

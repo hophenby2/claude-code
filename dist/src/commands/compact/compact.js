@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import chalk from "chalk";
 import { markPostCompaction } from "../../bootstrap/state.js";
@@ -25,7 +27,7 @@ import { getUpgradeMessage } from "../../utils/model/contextWindowUpgradeCheck.j
 import {
   buildEffectiveSystemPrompt
 } from "../../utils/systemPrompt.js";
-const reactiveCompact = false ? null : null;
+const reactiveCompact = false ? require2("../../services/compact/reactiveCompact.js") : null;
 const call = async (args, context) => {
   const { abortController } = context;
   let { messages } = context;

@@ -1,8 +1,10 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { formatFileSize } from "./format.js";
 let performance = null;
 function getPerformance() {
   if (!performance) {
-    performance = require("perf_hooks").performance;
+    performance = require2("perf_hooks").performance;
   }
   return performance;
 }

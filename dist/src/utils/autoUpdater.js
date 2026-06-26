@@ -34,9 +34,9 @@ async function assertMinVersion() {
   }
   try {
     const versionConfig = await getDynamicConfig_BLOCKS_ON_INIT("tengu_version_config", { minVersion: "0.0.0" });
-    if (versionConfig.minVersion && lt("0.0.0-dev", versionConfig.minVersion)) {
+    if (versionConfig.minVersion && lt("0.0.0", versionConfig.minVersion)) {
       console.error(`
-It looks like your version of Claude Code (${"0.0.0-dev"}) needs an update.
+It looks like your version of Claude Code (${"0.0.0"}) needs an update.
 A newer version (${versionConfig.minVersion} or higher) is required to continue.
 
 To update, please run:
@@ -302,7 +302,7 @@ async function installGlobalPackage(specificVersion) {
     );
     logEvent("tengu_auto_updater_lock_contention", {
       pid: process.pid,
-      currentVersion: "0.0.0-dev"
+      currentVersion: "0.0.0"
     });
     return "in_progress";
   }
@@ -311,7 +311,7 @@ async function installGlobalPackage(specificVersion) {
     if (!env.isRunningWithBun() && env.isNpmFromWindowsPath()) {
       logError(new Error("Windows NPM detected in WSL environment"));
       logEvent("tengu_auto_updater_windows_npm_in_wsl", {
-        currentVersion: "0.0.0-dev"
+        currentVersion: "0.0.0"
       });
       console.error(`
 Error: Windows NPM detected in WSL

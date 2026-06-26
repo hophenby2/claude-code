@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..')
 const srcRoot = path.join(root, 'src')
 const outdir = path.join(root, 'dist')
 
-const version = process.env.CLAUDE_CODE_RECONSTRUCTED_VERSION ?? '0.0.0-dev'
+const version = process.env.CLAUDE_CODE_RECONSTRUCTED_VERSION ?? '0.0.0'
 
 const enabledFeatures = new Set([
   // Keep this set deliberately small. Most leaked/internal/native-heavy features
@@ -58,8 +58,19 @@ function transformRelativeExtensions(source, filePath) {
   })
 }
 
+function transformCommonJsRequires(source) {
+  if (!/\brequire\s*\(/.test(source)) return source
+  const shim = "import { createRequire as __createRequire } from 'node:module'\nconst require = __createRequire(import.meta.url)\n"
+  if (source.startsWith('#!')) {
+    const newline = source.indexOf('\n')
+    if (newline === -1) return `${source}\n${shim}`
+    return `${source.slice(0, newline + 1)}${shim}${source.slice(newline + 1)}`
+  }
+  return `${shim}${source}`
+}
+
 function transformSource(source, filePath) {
-  return transformRelativeExtensions(transformTypeDeclarationSideEffects(transformSrcAliases(transformFeatures(source), filePath)), filePath)
+  return transformCommonJsRequires(transformRelativeExtensions(transformTypeDeclarationSideEffects(transformSrcAliases(transformFeatures(source), filePath)), filePath))
 }
 
 function resolveSourcePath(candidate) {

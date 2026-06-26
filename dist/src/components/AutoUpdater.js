@@ -37,7 +37,7 @@ function AutoUpdater({
       logForDebugging("AutoUpdater: Skipping update check in test/dev environment");
       return;
     }
-    const currentVersion = "0.0.0-dev";
+    const currentVersion = "0.0.0";
     const channel = getInitialSettings()?.autoUpdatesChannel ?? "latest";
     let latestVersion = await getLatestVersion(channel);
     const isDisabled = isAutoUpdaterDisabled();

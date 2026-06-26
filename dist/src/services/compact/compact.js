@@ -1,6 +1,8 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import uniqBy from "lodash-es/uniqBy.js";
-const sessionTranscriptModule = false ? null : null;
+const sessionTranscriptModule = false ? require2("../sessionTranscript/sessionTranscript.js") : null;
 import { APIUserAbortError } from "@anthropic-ai/sdk";
 import { markPostCompaction } from "../../bootstrap/state.js";
 import { getInvokedSkillsForAgent } from "../../bootstrap/state.js";

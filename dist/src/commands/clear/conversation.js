@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomUUID } from "crypto";
 import {
@@ -75,7 +77,7 @@ async function clearConversation({
   }
   setMessages(() => []);
   if (false) {
-    const { setContextBlocked } = null;
+    const { setContextBlocked } = require2("../../proactive/index.js");
     setContextBlocked(false);
   }
   if (setConversationId) {
@@ -155,10 +157,10 @@ async function clearConversation({
     );
   }
   if (false) {
-    const { saveMode } = null;
+    const { saveMode } = require2("../../utils/sessionStorage.js");
     const {
       isCoordinatorMode
-    } = null;
+    } = require2("../../coordinator/coordinatorMode.js");
     saveMode(isCoordinatorMode() ? "coordinator" : "normal");
   }
   const worktreeSession = getCurrentWorktreeSession();

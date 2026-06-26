@@ -195,7 +195,7 @@ function createBridgeLogger(options) {
       connectUrl = buildBridgeConnectUrl(environmentId, cachedIngressUrl);
       regenerateQr(connectUrl);
       if (verbose) {
-        write(chalk.dim(`Remote Control`) + ` v${"0.0.0-dev"}
+        write(chalk.dim(`Remote Control`) + ` v${"0.0.0"}
 `);
       }
       if (verbose) {

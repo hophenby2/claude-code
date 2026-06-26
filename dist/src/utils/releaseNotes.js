@@ -134,7 +134,7 @@ function getAllReleaseNotes(changelogContent = getStoredChangelogFromMemory()) {
     return [];
   }
 }
-async function checkForReleaseNotes(lastSeenVersion, currentVersion = "0.0.0-dev") {
+async function checkForReleaseNotes(lastSeenVersion, currentVersion = "0.0.0") {
   if (process.env.USER_TYPE === "ant") {
     const changelog = "";
     if (changelog) {
@@ -164,7 +164,7 @@ async function checkForReleaseNotes(lastSeenVersion, currentVersion = "0.0.0-dev
     releaseNotes
   };
 }
-function checkForReleaseNotesSync(lastSeenVersion, currentVersion = "0.0.0-dev") {
+function checkForReleaseNotesSync(lastSeenVersion, currentVersion = "0.0.0") {
   if (process.env.USER_TYPE === "ant") {
     const changelog = "";
     if (changelog) {

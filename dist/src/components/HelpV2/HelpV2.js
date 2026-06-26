@@ -132,7 +132,7 @@ function HelpV2(t0) {
   const t5 = insideModal ? void 0 : maxHeight;
   let t6;
   if ($[31] !== tabs) {
-    t6 = /* @__PURE__ */ jsx(Tabs, { title: false ? "/help" : `Claude Code v${"0.0.0-dev"}`, color: "professionalBlue", defaultTab: "general", children: tabs });
+    t6 = /* @__PURE__ */ jsx(Tabs, { title: false ? "/help" : `Claude Code v${"0.0.0"}`, color: "professionalBlue", defaultTab: "general", children: tabs });
     $[31] = tabs;
     $[32] = t6;
   } else {

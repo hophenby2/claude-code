@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { markPostCompaction } from "../../bootstrap/state.js";
 import { getSdkBetas } from "../../bootstrap/state.js";
@@ -108,7 +110,7 @@ async function shouldAutoCompact(messages, model, querySource, snipTokensFreed =
     }
   }
   if (false) {
-    const { isContextCollapseEnabled } = null;
+    const { isContextCollapseEnabled } = require2("../contextCollapse/index.js");
     if (isContextCollapseEnabled()) {
       return false;
     }

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { useMemo } from "react";
 import { useCommandQueue } from "../../hooks/useCommandQueue.js";
@@ -5,7 +7,7 @@ import { useAppState } from "../../state/AppState.js";
 import { getGlobalConfig } from "../../utils/config.js";
 import { getExampleCommandFromCache } from "../../utils/exampleCommands.js";
 import { isQueuedCommandEditable } from "../../utils/messageQueueManager.js";
-const proactiveModule = false ? null : null;
+const proactiveModule = false ? require2("../../proactive/index.js") : null;
 const NUM_TIMES_QUEUE_HINT_SHOWN = 3;
 const MAX_TEAMMATE_NAME_LENGTH = 20;
 function usePromptInputPlaceholder({

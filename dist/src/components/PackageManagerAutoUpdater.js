@@ -29,17 +29,17 @@ function PackageManagerAutoUpdater(t0) {
       const maxVersion = await getMaxVersion();
       if (maxVersion && latest && gt(latest, maxVersion)) {
         logForDebugging(`PackageManagerAutoUpdater: maxVersion ${maxVersion} is set, capping update from ${latest} to ${maxVersion}`);
-        if (gte("0.0.0-dev", maxVersion)) {
-          logForDebugging(`PackageManagerAutoUpdater: current version ${"0.0.0-dev"} is already at or above maxVersion ${maxVersion}, skipping update`);
+        if (gte("0.0.0", maxVersion)) {
+          logForDebugging(`PackageManagerAutoUpdater: current version ${"0.0.0"} is already at or above maxVersion ${maxVersion}, skipping update`);
           setUpdateAvailable(false);
           return;
         }
         latest = maxVersion;
       }
-      const hasUpdate = latest && !gte("0.0.0-dev", latest) && !shouldSkipVersion(latest);
+      const hasUpdate = latest && !gte("0.0.0", latest) && !shouldSkipVersion(latest);
       setUpdateAvailable(!!hasUpdate);
       if (hasUpdate) {
-        logForDebugging(`PackageManagerAutoUpdater: Update available ${"0.0.0-dev"} -> ${latest}`);
+        logForDebugging(`PackageManagerAutoUpdater: Update available ${"0.0.0"} -> ${latest}`);
       }
     };
     $[0] = t1;
@@ -70,7 +70,7 @@ function PackageManagerAutoUpdater(t0) {
   if ($[3] !== verbose) {
     t4 = verbose && /* @__PURE__ */ jsxs(Text, { dimColor: true, wrap: "truncate", children: [
       "currentVersion: ",
-      "0.0.0-dev"
+      "0.0.0"
     ] });
     $[3] = verbose;
     $[4] = t4;

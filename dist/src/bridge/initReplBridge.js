@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { hostname } from "os";
 import { getOriginalCwd, getSessionId } from "../bootstrap/state.js";
@@ -252,7 +254,7 @@ async function initReplBridge(options) {
   const sessionIngressUrl = process.env.USER_TYPE === "ant" && process.env.CLAUDE_BRIDGE_SESSION_INGRESS_URL ? process.env.CLAUDE_BRIDGE_SESSION_INGRESS_URL : baseUrl;
   let workerType = "claude_code";
   if (false) {
-    const { isAssistantMode } = null;
+    const { isAssistantMode } = require2("../assistant/index.js");
     if (isAssistantMode()) {
       workerType = "claude_code_assistant";
     }

@@ -30,7 +30,7 @@ function completeOnboarding() {
   saveGlobalConfig((current) => ({
     ...current,
     hasCompletedOnboarding: true,
-    lastOnboardingVersion: "0.0.0-dev"
+    lastOnboardingVersion: "0.0.0"
   }));
 }
 function showDialog(root, renderer) {

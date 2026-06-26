@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { profileCheckpoint, profileReport } from "./utils/startupProfiler.js";
 profileCheckpoint("main_tsx_entry");
 import { startMdmRawRead } from "./utils/settings/mdm/rawRead.js";
@@ -46,12 +48,12 @@ import { jsonParse, writeFileSync_DEPRECATED } from "./utils/slowOperations.js";
 import { computeInitialTeamContext } from "./utils/swarm/reconnection.js";
 import { initializeWarningHandler } from "./utils/warningHandler.js";
 import { isWorktreeModeEnabled } from "./utils/worktreeModeEnabled.js";
-const getTeammateUtils = () => require("./utils/teammate.js");
-const getTeammatePromptAddendum = () => require("./utils/swarm/teammatePromptAddendum.js");
-const getTeammateModeSnapshot = () => require("./utils/swarm/backends/teammateModeSnapshot.js");
-const coordinatorModeModule = false ? null : null;
-const assistantModule = false ? null : null;
-const kairosGate = false ? null : null;
+const getTeammateUtils = () => require2("./utils/teammate.js");
+const getTeammatePromptAddendum = () => require2("./utils/swarm/teammatePromptAddendum.js");
+const getTeammateModeSnapshot = () => require2("./utils/swarm/backends/teammateModeSnapshot.js");
+const coordinatorModeModule = false ? require2("./coordinator/coordinatorMode.js") : null;
+const assistantModule = false ? require2("./assistant/index.js") : null;
+const kairosGate = false ? require2("./assistant/gate.js") : null;
 import { resolve } from "path";
 import { isAnalyticsDisabled } from "./services/analytics/config.js";
 import { getFeatureValue_CACHED_MAY_BE_STALE } from "./services/analytics/growthbook.js";
@@ -130,7 +132,7 @@ import { processResumedConversation } from "./utils/sessionRestore.js";
 import { parseSettingSourcesFlag } from "./utils/settings/constants.js";
 import { plural } from "./utils/stringUtils.js";
 import { getInitialMainLoopModel, getIsNonInteractiveSession, getSdkBetas, getSessionId, setAllowedSettingSources, setChromeFlagOverride, setClientType, setFlagSettingsPath, setInitialMainLoopModel, setInlinePlugins, setIsInteractive, setOriginalCwd, setQuestionPreviewFormat, setSdkBetas, setSessionBypassPermissionsMode, setSessionPersistenceDisabled, setSessionSource, setUserMsgOptIn, switchSession } from "./bootstrap/state.js";
-const autoModeStateModule = false ? null : null;
+const autoModeStateModule = false ? require2("./utils/permissions/autoModeState.js") : null;
 import { migrateAutoUpdatesToSettings } from "./migrations/migrateAutoUpdatesToSettings.js";
 import { migrateBypassPermissionsAcceptedToSettings } from "./migrations/migrateBypassPermissionsAcceptedToSettings.js";
 import { migrateEnableAllProjectMcpServersToSettings } from "./migrations/migrateEnableAllProjectMcpServersToSettings.js";
@@ -1189,10 +1191,10 @@ ${hint}` : hint;
       const {
         BRIEF_TOOL_NAME,
         LEGACY_BRIEF_TOOL_NAME
-      } = null;
+      } = require2("./tools/BriefTool/prompt.js");
       const {
         isBriefEntitled
-      } = null;
+      } = require2("./tools/BriefTool/BriefTool.js");
       const parsed = parseToolListFromCLI(baseTools);
       if ((parsed.includes(BRIEF_TOOL_NAME) || parsed.includes(LEGACY_BRIEF_TOOL_NAME)) && isBriefEntitled()) {
         setUserMsgOptIn(true);
@@ -1474,13 +1476,13 @@ ${customInstructions}` : customInstructions;
     if (false) {
       const {
         isBriefEntitled
-      } = null;
+      } = require2("./tools/BriefTool/BriefTool.js");
       if (isBriefEntitled()) {
         setUserMsgOptIn(true);
       }
     }
     if (false) {
-      const briefVisibility = false ? null.isBriefEnabled() ? "Call SendUserMessage at checkpoints to mark where things stand." : "The user will see any text you output." : "The user will see any text you output.";
+      const briefVisibility = false ? require2("./tools/BriefTool/BriefTool.js").isBriefEnabled() ? "Call SendUserMessage at checkpoints to mark where things stand." : "The user will see any text you output." : "The user will see any text you output.";
       const proactivePrompt = `
 # Proactive Mode
 
@@ -1695,7 +1697,7 @@ ${inputPrompt}` : mergePrompt;
       }
     }
     logForDiagnosticsNoPII("info", "started", {
-      version: "0.0.0-dev",
+      version: "0.0.0",
       is_native_binary: isInBundledMode()
     });
     registerCleanup(async () => {
@@ -2018,7 +2020,7 @@ ${inputPrompt}` : mergePrompt;
     if (false) {
       const {
         isCcrMirrorEnabled
-      } = null;
+      } = require2("./bridge/bridgeEnabled.js");
       ccrMirrorEnabled = isCcrMirrorEnabled();
     }
     const initialState = {
@@ -2290,7 +2292,7 @@ Session: ${directConnectConfig.sessionId}`, "info");
           sshSession = await createSSHSession({
             host: _pendingSSH.host,
             cwd: _pendingSSH.cwd,
-            localVersion: "0.0.0-dev",
+            localVersion: "0.0.0",
             permissionMode: _pendingSSH.permissionMode,
             dangerouslySkipPermissions: _pendingSSH.dangerouslySkipPermissions,
             extraCliArgs: _pendingSSH.extraCliArgs
@@ -2802,7 +2804,7 @@ Auth: unix socket -R \u2192 local proxy`, "info");
         pendingHookMessages
       }, renderAndRun);
     }
-  }).version(`${"0.0.0-dev"} (Claude Code)`, "-v, --version", "Output the version number");
+  }).version(`${"0.0.0"} (Claude Code)`, "-v, --version", "Output the version number");
   program.option("-w, --worktree [name]", "Create a new git worktree for this session (optionally specify a name)");
   program.option("--tmux", "Create a tmux session for the worktree (requires --worktree). Uses iTerm2 native panes when available; use --tmux=classic for traditional tmux.");
   if (canUserConfigureAdvisor()) {
@@ -3378,7 +3380,7 @@ async function logTenguInit({
 }
 function maybeActivateProactive(options) {
   if (false) {
-    const proactiveModule = null;
+    const proactiveModule = require2("./proactive/index.js");
     if (!proactiveModule.isProactiveActive()) {
       proactiveModule.activateProactive("command");
     }
@@ -3391,7 +3393,7 @@ function maybeActivateBrief(options) {
   if (!briefFlag && !briefEnv) return;
   const {
     isBriefEntitled
-  } = require("./tools/BriefTool/BriefTool.js");
+  } = require2("./tools/BriefTool/BriefTool.js");
   const entitled = isBriefEntitled();
   if (entitled) {
     setUserMsgOptIn(true);

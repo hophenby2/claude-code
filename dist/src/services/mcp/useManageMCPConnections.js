@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { basename } from "path";
 import { useCallback, useEffect, useRef } from "react";
@@ -10,8 +12,8 @@ import {
   getMcpToolsCommandsAndResources,
   reconnectMcpServerImpl
 } from "./client.js";
-const fetchMcpSkillsForClient = false ? null.fetchMcpSkillsForClient : null;
-const clearSkillIndexCache = false ? null.clearSkillIndexCache : null;
+const fetchMcpSkillsForClient = false ? require2("../../skills/mcpSkills.js").fetchMcpSkillsForClient : null;
+const clearSkillIndexCache = false ? require2("../skillSearch/localSearch.js").clearSkillIndexCache : null;
 import {
   PromptListChangedNotificationSchema,
   ResourceListChangedNotificationSchema,

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { microcompactMessages } from "../../services/compact/microCompact.js";
 import {
@@ -21,7 +23,7 @@ async function collectContextData(context) {
   } = context;
   let apiView = getMessagesAfterCompactBoundary(messages);
   if (false) {
-    const { projectView } = null;
+    const { projectView } = require2("../../services/contextCollapse/operations.js");
     apiView = projectView(apiView);
   }
   const { messages: compactedMessages } = await microcompactMessages(apiView);
@@ -73,7 +75,7 @@ function formatContextAsMarkdownTable(data) {
   output += `**Tokens:** ${formatTokens(totalTokens)} / ${formatTokens(rawMaxTokens)} (${percentage}%)
 `;
   if (false) {
-    const { getStats, isContextCollapseEnabled } = null;
+    const { getStats, isContextCollapseEnabled } = require2("../../services/contextCollapse/index.js");
     if (isContextCollapseEnabled()) {
       const s = getStats();
       const { health: h } = s;

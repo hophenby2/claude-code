@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { ContextVisualization } from "../../components/ContextVisualization.js";
 import { microcompactMessages } from "../../services/compact/microCompact.js";
@@ -10,7 +12,7 @@ function toApiView(messages) {
   if (false) {
     const {
       projectView
-    } = null;
+    } = require2("../../services/contextCollapse/operations.js");
     view = projectView(view);
   }
   return view;

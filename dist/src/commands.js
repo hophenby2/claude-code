@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import addDir from "./commands/add-dir/index.js";
 import autofixPr from "./commands/autofix-pr/index.js";
 import backfillSessions from "./commands/backfill-sessions/index.js";
@@ -43,7 +45,7 @@ import skills from "./commands/skills/index.js";
 import status from "./commands/status/index.js";
 import tasks from "./commands/tasks/index.js";
 import teleport from "./commands/teleport/index.js";
-const agentsPlatform = process.env.USER_TYPE === "ant" ? require("./commands/agents-platform/index.js").default : null;
+const agentsPlatform = process.env.USER_TYPE === "ant" ? require2("./commands/agents-platform/index.js").default : null;
 import securityReview from "./commands/security-review.js";
 import bughunter from "./commands/bughunter/index.js";
 import terminalSetup from "./commands/terminalSetup/index.js";
@@ -51,22 +53,22 @@ import usage from "./commands/usage/index.js";
 import theme from "./commands/theme/index.js";
 import vim from "./commands/vim/index.js";
 const feature = (_name) => false;
-const proactive = false ? null.default : null;
-const briefCommand = false ? null.default : null;
-const assistantCommand = false ? null.default : null;
-const bridge = false ? null.default : null;
-const remoteControlServerCommand = false ? null.default : null;
-const voiceCommand = false ? null.default : null;
-const forceSnip = false ? null.default : null;
-const workflowsCmd = false ? null.default : null;
-const webCmd = false ? null.default : null;
-const clearSkillIndexCache = false ? null.clearSkillIndexCache : null;
-const subscribePr = false ? null.default : null;
-const ultraplan = false ? null.default : null;
-const torch = false ? null.default : null;
-const peersCmd = false ? null.default : null;
-const forkCmd = false ? null.default : null;
-const buddy = false ? null.default : null;
+const proactive = false ? require2("./commands/proactive.js").default : null;
+const briefCommand = false ? require2("./commands/brief.js").default : null;
+const assistantCommand = false ? require2("./commands/assistant/index.js").default : null;
+const bridge = false ? require2("./commands/bridge/index.js").default : null;
+const remoteControlServerCommand = false ? require2("./commands/remoteControlServer/index.js").default : null;
+const voiceCommand = false ? require2("./commands/voice/index.js").default : null;
+const forceSnip = false ? require2("./commands/force-snip.js").default : null;
+const workflowsCmd = false ? require2("./commands/workflows/index.js").default : null;
+const webCmd = false ? require2("./commands/remote-setup/index.js").default : null;
+const clearSkillIndexCache = false ? require2("./services/skillSearch/localSearch.js").clearSkillIndexCache : null;
+const subscribePr = false ? require2("./commands/subscribe-pr.js").default : null;
+const ultraplan = false ? require2("./commands/ultraplan.js").default : null;
+const torch = false ? require2("./commands/torch.js").default : null;
+const peersCmd = false ? require2("./commands/peers/index.js").default : null;
+const forkCmd = false ? require2("./commands/fork/index.js").default : null;
+const buddy = false ? require2("./commands/buddy/index.js").default : null;
 import thinkback from "./commands/thinkback/index.js";
 import thinkbackPlay from "./commands/thinkback-play/index.js";
 import permissions from "./commands/permissions/index.js";
@@ -310,7 +312,7 @@ async function getSkills(cwd) {
     };
   }
 }
-const getWorkflowCommands = false ? null.getWorkflowCommands : null;
+const getWorkflowCommands = false ? require2("./tools/WorkflowTool/createWorkflowCommand.js").getWorkflowCommands : null;
 function meetsAvailabilityRequirement(cmd) {
   if (!cmd.availability) return true;
   for (const a of cmd.availability) {

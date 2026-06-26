@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import "child_process";
@@ -86,22 +88,22 @@ import { useTeammateViewAutoExit } from "../hooks/useTeammateViewAutoExit.js";
 import { errorMessage } from "../utils/errors.js";
 import { isHumanTurn } from "../utils/messagePredicates.js";
 import "../utils/log.js";
-const useVoiceIntegration = false ? null.useVoiceIntegration : () => ({
+const useVoiceIntegration = false ? require2("../hooks/useVoiceIntegration.js").useVoiceIntegration : () => ({
   stripTrailing: () => 0,
   handleKeyEvent: () => {
   },
   resetAnchor: () => {
   }
 });
-const VoiceKeybindingHandler = false ? null.VoiceKeybindingHandler : () => null;
-const useFrustrationDetection = false ? null.useFrustrationDetection : () => ({
+const VoiceKeybindingHandler = false ? require2("../hooks/useVoiceIntegration.js").VoiceKeybindingHandler : () => null;
+const useFrustrationDetection = false ? require2("../components/FeedbackSurvey/useFrustrationDetection.js").useFrustrationDetection : () => ({
   state: "closed",
   handleTranscriptSelect: () => {
   }
 });
-const useAntOrgWarningNotification = false ? null.useAntOrgWarningNotification : () => {
+const useAntOrgWarningNotification = false ? require2("../hooks/notifs/useAntOrgWarningNotification.js").useAntOrgWarningNotification : () => {
 };
-const getCoordinatorUserContext = false ? null.getCoordinatorUserContext : () => ({});
+const getCoordinatorUserContext = false ? require2("../coordinator/coordinatorMode.js").getCoordinatorUserContext : () => ({});
 import useCanUseTool from "../hooks/useCanUseTool.js";
 import { applyPermissionUpdate, applyPermissionUpdates, persistPermissionUpdate } from "../utils/permissions/PermissionUpdate.js";
 import { buildPermissionUpdates } from "../components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.js";
@@ -161,13 +163,13 @@ import { updateSessionName } from "../utils/concurrentSessions.js";
 import { isInProcessTeammateTask } from "../tasks/InProcessTeammateTask/types.js";
 import { restoreRemoteAgentTasks } from "../tasks/RemoteAgentTask/RemoteAgentTask.js";
 import { useInboxPoller } from "../hooks/useInboxPoller.js";
-const proactiveModule = false ? null : null;
+const proactiveModule = false ? require2("../proactive/index.js") : null;
 const PROACTIVE_NO_OP_SUBSCRIBE = (_cb) => () => {
 };
 const PROACTIVE_FALSE = () => false;
 const SUGGEST_BG_PR_NOOP = (_p, _n) => false;
-const useProactive = false ? null.useProactive : null;
-const useScheduledTasks = false ? null.useScheduledTasks : null;
+const useProactive = false ? require2("../proactive/useProactive.js").useProactive : null;
+const useScheduledTasks = false ? require2("../hooks/useScheduledTasks.js").useScheduledTasks : null;
 import { isAgentSwarmsEnabled } from "../utils/agentSwarmsEnabled.js";
 import "../hooks/useTaskListWatcher.js";
 import { closeOpenDiffs, getConnectedIdeClient } from "../utils/ide.js";
@@ -185,9 +187,9 @@ import { handleSpeculationAccept } from "../services/PromptSuggestion/speculatio
 import { IdeOnboardingDialog } from "../components/IdeOnboardingDialog.js";
 import { EffortCallout, shouldShowEffortCallout } from "../components/EffortCallout.js";
 import { RemoteCallout } from "../components/RemoteCallout.js";
-const AntModelSwitchCallout = false ? null.AntModelSwitchCallout : null;
-const shouldShowAntModelSwitch = false ? null.shouldShowModelSwitchCallout : () => false;
-const UndercoverAutoCallout = false ? null.UndercoverAutoCallout : null;
+const AntModelSwitchCallout = false ? require2("../components/AntModelSwitchCallout.js").AntModelSwitchCallout : null;
+const shouldShowAntModelSwitch = false ? require2("../components/AntModelSwitchCallout.js").shouldShowModelSwitchCallout : () => false;
+const UndercoverAutoCallout = false ? require2("../components/UndercoverAutoCallout.js").UndercoverAutoCallout : null;
 import { activityManager } from "../utils/activityManager.js";
 import { createAbortController } from "../utils/abortController.js";
 import { MCPConnectionManager } from "../services/mcp/MCPConnectionManager.js";
@@ -232,7 +234,7 @@ import { useTeammateLifecycleNotification } from "../hooks/notifs/useTeammateShu
 import { useFastModeNotification } from "../hooks/notifs/useFastModeNotification.js";
 import { AutoRunIssueNotification, shouldAutoRunIssue, getAutoRunIssueReasonText, getAutoRunCommand } from "../utils/autoRunIssue.js";
 import "../tools/TungstenTool/TungstenLiveMonitor.js";
-const WebBrowserPanelModule = false ? null : null;
+const WebBrowserPanelModule = false ? require2("../tools/WebBrowserTool/WebBrowserPanel.js") : null;
 import { IssueFlagBanner } from "../components/PromptInput/IssueFlagBanner.js";
 import { useIssueFlagBanner } from "../hooks/useIssueFlagBanner.js";
 import { MIN_COLS_FOR_FULL_SPRITE } from "../buddy/CompanionSprite.js";
@@ -1177,13 +1179,13 @@ function REPL({
     try {
       const messages2 = deserializeMessages(log.messages);
       if (false) {
-        const coordinatorModule = null;
+        const coordinatorModule = require2("../coordinator/coordinatorMode.js");
         const warning = coordinatorModule.matchSessionMode(log.mode);
         if (warning) {
           const {
             getAgentDefinitionsWithOverrides,
             getActiveAgentsFromList
-          } = null;
+          } = require2("../tools/AgentTool/loadAgentsDir.js");
           getAgentDefinitionsWithOverrides.cache.clear?.();
           const freshAgentDefs = await getAgentDefinitionsWithOverrides(getOriginalCwd());
           setAppState((prev) => ({
@@ -1265,10 +1267,10 @@ function REPL({
       if (false) {
         const {
           saveMode
-        } = null;
+        } = require2("../utils/sessionStorage.js");
         const {
           isCoordinatorMode
-        } = null;
+        } = require2("../coordinator/coordinatorMode.js");
         saveMode(isCoordinatorMode() ? "coordinator" : "normal");
       }
       if (targetSessionCosts) {
@@ -2569,7 +2571,7 @@ Error: sandbox required but unavailable: ${reason}
     resetMicrocompactState();
     if (false) {
       ;
-      null.resetContextCollapse();
+      require2("../services/contextCollapse/index.js").resetContextCollapse();
     }
     setAppState((prev2) => ({
       ...prev2,

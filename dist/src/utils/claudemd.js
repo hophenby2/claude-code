@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import ignore from "ignore";
 import memoize from "lodash-es/memoize.js";
@@ -47,7 +49,7 @@ import { expandPath } from "./path.js";
 import { pathInWorkingPath } from "./permissions/filesystem.js";
 import { isSettingSourceEnabled } from "./settings/constants.js";
 import { getInitialSettings } from "./settings/settings.js";
-const teamMemPaths = false ? null : null;
+const teamMemPaths = false ? require2("../memdir/teamMemPaths.js") : null;
 let hasLoggedInitialLoad = false;
 const MEMORY_INSTRUCTION_PROMPT = "Codebase and user instructions are shown below. Be sure to adhere to these instructions. IMPORTANT: These instructions OVERRIDE any default behavior and you MUST follow them exactly as written.";
 const MAX_MEMORY_CHARACTER_COUNT = 4e4;

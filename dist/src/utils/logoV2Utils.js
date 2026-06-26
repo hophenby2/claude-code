@@ -137,7 +137,7 @@ function formatReleaseNoteForDisplay(note, maxWidth) {
   return truncate(note, maxWidth);
 }
 function getLogoDisplayData() {
-  const version = process.env.DEMO_VERSION ?? "0.0.0-dev";
+  const version = process.env.DEMO_VERSION ?? "0.0.0";
   const serverUrl = getDirectConnectServerUrl();
   const displayPath = process.env.DEMO_VERSION ? "/code/claude" : getDisplayPath(getCwd());
   const cwd = serverUrl ? `${displayPath} in ${serverUrl.replace(/^https?:\/\//, "")}` : displayPath;

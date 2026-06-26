@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { useSyncExternalStore } from "react";
@@ -14,7 +16,7 @@ function CollapseLabel(t0) {
   } = t0;
   let t1;
   if ($[0] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-    t1 = require("../services/contextCollapse/index.js");
+    t1 = require2("../services/contextCollapse/index.js");
     $[0] = t1;
   } else {
     t1 = $[0];
@@ -124,7 +126,7 @@ function TokenWarning(t0) {
   if (false) {
     const {
       isContextCollapseEnabled
-    } = null;
+    } = require2("../services/contextCollapse/index.js");
     if (isContextCollapseEnabled()) {
       collapseMode = true;
     }

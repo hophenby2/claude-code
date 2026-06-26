@@ -331,7 +331,7 @@ function detectLinuxGlobPatternWarnings() {
 }
 async function getDoctorDiagnostic() {
   const installationType = await getCurrentInstallationType();
-  const version = typeof MACRO !== "undefined" && "0.0.0-dev" ? "0.0.0-dev" : "unknown";
+  const version = typeof MACRO !== "undefined" && "0.0.0" ? "0.0.0" : "unknown";
   const installationPath = await getInstallationPath();
   const invokedBinary = getInvokedBinary();
   const multipleInstallations = await detectMultipleInstallations();

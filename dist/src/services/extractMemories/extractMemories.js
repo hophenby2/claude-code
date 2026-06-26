@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { basename } from "path";
 import { getIsRemoteMode } from "../../bootstrap/state.js";
@@ -35,7 +37,7 @@ import { sanitizeToolNameForAnalytics } from "../analytics/metadata.js";
 import {
   buildExtractAutoOnlyPrompt
 } from "./prompts.js";
-const teamMemPaths = false ? null : null;
+const teamMemPaths = false ? require2("../../memdir/teamMemPaths.js") : null;
 function isModelVisibleMessage(message) {
   return message.type === "user" || message.type === "assistant";
 }

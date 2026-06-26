@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 let autoModeActive = false;
 let autoModeFlagCli = false;
 let autoModeCircuitBroken = false;

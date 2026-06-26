@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import memoize from "lodash-es/memoize.js";
 import { logForDebugging } from "./debug.js";
 import { hasNodeOption } from "./envUtils.js";
@@ -11,7 +13,7 @@ const getCACertificates = memoize(() => {
   if (!useSystemCA && !extraCertsPath) {
     return void 0;
   }
-  const tls = require("tls");
+  const tls = require2("tls");
   const certs = [];
   if (useSystemCA) {
     const getCACerts = tls.getCACertificates;

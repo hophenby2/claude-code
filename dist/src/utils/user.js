@@ -52,7 +52,7 @@ const getCoreUserData = memoize(
       deviceId,
       sessionId: getSessionId(),
       email: getEmail(),
-      appVersion: "0.0.0-dev",
+      appVersion: "0.0.0",
       platform: getHostPlatformForAnalytics(),
       organizationUuid,
       accountUuid,

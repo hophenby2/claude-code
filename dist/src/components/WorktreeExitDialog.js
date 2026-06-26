@@ -1,4 +1,6 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { useEffect, useState } from "react";
 import { logEvent } from "../services/analytics/index.js";
 import { logForDebugging } from "../utils/debug.js";
@@ -12,7 +14,7 @@ import { Dialog } from "./design-system/Dialog.js";
 import { Spinner } from "./Spinner.js";
 function recordWorktreeExit() {
   ;
-  require("../utils/sessionStorage.js").saveWorktreeState(null);
+  require2("../utils/sessionStorage.js").saveWorktreeState(null);
 }
 function WorktreeExitDialog({
   onDone,

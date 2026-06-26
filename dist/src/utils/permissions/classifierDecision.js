@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { ASK_USER_QUESTION_TOOL_NAME } from "../../tools/AskUserQuestionTool/prompt.js";
 import { ENTER_PLAN_MODE_TOOL_NAME } from "../../tools/EnterPlanModeTool/constants.js";
@@ -20,10 +22,10 @@ import { TEAM_DELETE_TOOL_NAME } from "../../tools/TeamDeleteTool/constants.js";
 import { TODO_WRITE_TOOL_NAME } from "../../tools/TodoWriteTool/constants.js";
 import { TOOL_SEARCH_TOOL_NAME } from "../../tools/ToolSearchTool/prompt.js";
 import { YOLO_CLASSIFIER_TOOL_NAME } from "./yoloClassifier.js";
-const TERMINAL_CAPTURE_TOOL_NAME = false ? null.TERMINAL_CAPTURE_TOOL_NAME : null;
-const OVERFLOW_TEST_TOOL_NAME = false ? null.OVERFLOW_TEST_TOOL_NAME : null;
-const VERIFY_PLAN_EXECUTION_TOOL_NAME = process.env.USER_TYPE === "ant" ? require("../../tools/VerifyPlanExecutionTool/constants.js").VERIFY_PLAN_EXECUTION_TOOL_NAME : null;
-const WORKFLOW_TOOL_NAME = false ? null.WORKFLOW_TOOL_NAME : null;
+const TERMINAL_CAPTURE_TOOL_NAME = false ? require2("../../tools/TerminalCaptureTool/prompt.js").TERMINAL_CAPTURE_TOOL_NAME : null;
+const OVERFLOW_TEST_TOOL_NAME = false ? require2("../../tools/OverflowTestTool/OverflowTestTool.js").OVERFLOW_TEST_TOOL_NAME : null;
+const VERIFY_PLAN_EXECUTION_TOOL_NAME = process.env.USER_TYPE === "ant" ? require2("../../tools/VerifyPlanExecutionTool/constants.js").VERIFY_PLAN_EXECUTION_TOOL_NAME : null;
+const WORKFLOW_TOOL_NAME = false ? require2("../../tools/WorkflowTool/constants.js").WORKFLOW_TOOL_NAME : null;
 const SAFE_YOLO_ALLOWLISTED_TOOLS = /* @__PURE__ */ new Set([
   // Read-only file operations
   FILE_READ_TOOL_NAME,

@@ -5,16 +5,37 @@
 // typecheck against a stable module boundary while the exact generated SDK
 // surface is restored later from coreSchemas.ts.
 
-export type ModelUsage = any
-export type OutputFormat = any
-export type ApiKeySource = any
-export type ConfigScope = any
+export type ModelUsage = {
+  inputTokens: number
+  outputTokens: number
+  cacheReadInputTokens: number
+  cacheCreationInputTokens: number
+  webSearchRequests: number
+  costUSD: number
+  contextWindow: number
+  maxOutputTokens: number
+}
+export type OutputFormat = {
+  type: 'json_schema'
+  schema: Record<string, unknown>
+}
+export type ApiKeySource = 'user' | 'project' | 'org' | 'temporary' | 'oauth'
+export type ConfigScope = 'local' | 'user' | 'project'
 export type McpServerConfigForProcessTransport = any
 export type McpServerStatus = any
-export type McpSetServersResult = any
+export type McpSetServersResult = {
+  added: string[]
+  removed: string[]
+  errors: Record<string, string>
+}
 export type PermissionUpdate = any
 export type PermissionResult = any
-export type PermissionMode = any
+export type PermissionMode =
+  | 'default'
+  | 'acceptEdits'
+  | 'bypassPermissions'
+  | 'plan'
+  | 'dontAsk'
 export type HookEvent = any
 export type HookInput = any
 export type AsyncHookJSONOutput = any
@@ -45,7 +66,13 @@ export type CwdChangedHookInput = any
 export type FileChangedHookInput = any
 export type SessionEndHookInput = any
 export type HookJSONOutput = any
-export type ExitReason = any
+export type ExitReason =
+  | 'clear'
+  | 'resume'
+  | 'logout'
+  | 'prompt_input_exit'
+  | 'other'
+  | 'bypass_permissions_disabled'
 export type PromptRequest = any
 export type PromptResponse = any
 export type SlashCommand = any
@@ -56,7 +83,7 @@ export type AgentMcpServerSpec = any
 export type AgentDefinition = any
 export type RewindFilesResult = any
 export type SDKAssistantMessageError = any
-export type SDKStatus = any
+export type SDKStatus = 'compacting' | null
 export type SDKUserMessage = any
 export type SDKUserMessageReplay = any
 export type SDKRateLimitInfo = any
@@ -74,4 +101,4 @@ export type SDKPostTurnSummaryMessage = any
 export type SDKToolProgressMessage = any
 export type SDKSessionInfo = any
 export type SDKMessage = any
-export type FastModeState = any
+export type FastModeState = 'off' | 'cooldown' | 'on'

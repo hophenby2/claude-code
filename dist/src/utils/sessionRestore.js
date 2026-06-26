@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { dirname } from "path";
 import {
@@ -70,7 +72,7 @@ function restoreSessionStateFromLog(result, setAppState) {
   }
   if (false) {
     ;
-    null.restoreFromEntries(
+    require2("../services/contextCollapse/persist.js").restoreFromEntries(
       result.contextCollapseCommits ?? [],
       result.contextCollapseSnapshot
     );
@@ -204,7 +206,7 @@ async function processResumedConversation(result, opts, context) {
   }
   if (false) {
     ;
-    null.restoreFromEntries(
+    require2("../services/contextCollapse/persist.js").restoreFromEntries(
       result.contextCollapseCommits ?? [],
       result.contextCollapseSnapshot
     );

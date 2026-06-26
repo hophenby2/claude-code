@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { useCallback } from "react";
 import instances from "../ink/instances.js";
@@ -29,7 +31,7 @@ function GlobalKeybindingHandlers({
         getAllInProcessTeammateTasks
       } = (
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("../tasks/InProcessTeammateTask/InProcessTeammateTask.js")
+        require2("../tasks/InProcessTeammateTask/InProcessTeammateTask.js")
       );
       const hasTeammates = count(getAllInProcessTeammateTasks(prev.tasks), (t) => t.status === "running") > 0;
       if (hasTeammates) {
@@ -65,7 +67,7 @@ function GlobalKeybindingHandlers({
     if (false) {
       const {
         isBriefEnabled
-      } = null;
+      } = require2("../tools/BriefTool/BriefTool.js");
       if (!isBriefEnabled() && isBriefOnly && screen !== "transcript") {
         setAppState((prev_0) => {
           if (!prev_0.isBriefOnly) return prev_0;
@@ -114,7 +116,7 @@ function GlobalKeybindingHandlers({
     if (false) {
       const {
         isBriefEnabled: isBriefEnabled_0
-      } = null;
+      } = require2("../tools/BriefTool/BriefTool.js");
       if (!isBriefEnabled_0() && !isBriefOnly) return;
       const next = !isBriefOnly;
       logEvent("tengu_brief_mode_toggled", {

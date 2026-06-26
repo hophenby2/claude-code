@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import chalk from "chalk";
@@ -58,9 +60,9 @@ const LogoHeader = React.memo(function LogoHeader2(t0) {
   }
   return t2;
 });
-const proactiveModule = false ? null : null;
-const BRIEF_TOOL_NAME = false ? null.BRIEF_TOOL_NAME : null;
-const SEND_USER_FILE_TOOL_NAME = false ? null.SEND_USER_FILE_TOOL_NAME : null;
+const proactiveModule = false ? require2("../proactive/index.js") : null;
+const BRIEF_TOOL_NAME = false ? require2("../tools/BriefTool/prompt.js").BRIEF_TOOL_NAME : null;
+const SEND_USER_FILE_TOOL_NAME = false ? require2("../tools/SendUserFileTool/prompt.js").SEND_USER_FILE_TOOL_NAME : null;
 import { VirtualMessageList } from "./VirtualMessageList.js";
 function filterForBriefTool(messages, briefToolNames) {
   const nameSet = new Set(briefToolNames);

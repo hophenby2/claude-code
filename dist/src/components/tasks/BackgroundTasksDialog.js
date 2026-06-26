@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import figures from "figures";
@@ -30,14 +32,14 @@ import { DreamDetailDialog } from "./DreamDetailDialog.js";
 import { InProcessTeammateDetailDialog } from "./InProcessTeammateDetailDialog.js";
 import { RemoteSessionDetailDialog } from "./RemoteSessionDetailDialog.js";
 import { ShellDetailDialog } from "./ShellDetailDialog.js";
-const WorkflowDetailDialog = false ? null.WorkflowDetailDialog : null;
-const workflowTaskModule = false ? null : null;
+const WorkflowDetailDialog = false ? require2("./WorkflowDetailDialog.js").WorkflowDetailDialog : null;
+const workflowTaskModule = false ? require2("../../tasks/LocalWorkflowTask/LocalWorkflowTask.js") : null;
 const killWorkflowTask = workflowTaskModule?.killWorkflowTask ?? null;
 const skipWorkflowAgent = workflowTaskModule?.skipWorkflowAgent ?? null;
 const retryWorkflowAgent = workflowTaskModule?.retryWorkflowAgent ?? null;
-const monitorMcpModule = false ? null : null;
+const monitorMcpModule = false ? require2("../../tasks/MonitorMcpTask/MonitorMcpTask.js") : null;
 const killMonitorMcp = monitorMcpModule?.killMonitorMcp ?? null;
-const MonitorMcpDetailDialog = false ? null.MonitorMcpDetailDialog : null;
+const MonitorMcpDetailDialog = false ? require2("./MonitorMcpDetailDialog.js").MonitorMcpDetailDialog : null;
 function getSelectableBackgroundTasks(tasks, foregroundedTaskId) {
   const backgroundTasks = Object.values(tasks ?? {}).filter(isBackgroundTask);
   return backgroundTasks.filter((task) => !(task.type === "local_agent" && task.id === foregroundedTaskId));

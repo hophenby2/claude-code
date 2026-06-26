@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import axios from "axios";
 import { execa } from "execa";
 import capitalize from "lodash-es/capitalize.js";
@@ -22,7 +24,7 @@ import { isJetBrainsPluginInstalledCached } from "./jetbrains.js";
 import { logError } from "./log.js";
 import { getPlatform } from "./platform.js";
 import { lt } from "./semver.js";
-const ideOnboardingDialog = () => require("../components/IdeOnboardingDialog.js");
+const ideOnboardingDialog = () => require2("../components/IdeOnboardingDialog.js");
 import { createAbortController } from "./abortController.js";
 import { logForDebugging } from "./debug.js";
 import { envDynamic } from "./envDynamic.js";
@@ -632,7 +634,7 @@ function getInstallationEnv() {
   return void 0;
 }
 function getClaudeCodeVersion() {
-  return "0.0.0-dev";
+  return "0.0.0";
 }
 async function getInstalledVSCodeExtensionVersion(command) {
   const { stdout } = await execFileNoThrow(

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import uniqBy from "lodash-es/uniqBy.js";
 import { dirname } from "path";
@@ -60,10 +62,10 @@ async function getAllCommands(context) {
   return uniqBy([...localCommands, ...mcpSkills], "name");
 }
 const remoteSkillModules = false ? {
-  ...null,
-  ...null,
-  ...null,
-  ...null
+  ...require2("../../services/skillSearch/remoteSkillState.js"),
+  ...require2("../../services/skillSearch/remoteSkillLoader.js"),
+  ...require2("../../services/skillSearch/telemetry.js"),
+  ...require2("../../services/skillSearch/featureCheck.js")
 } : null;
 async function executeForkedSkill(command, commandName, args, context, canUseTool, parentMessage, onProgress) {
   const startTime = Date.now();

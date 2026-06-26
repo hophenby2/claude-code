@@ -1,7 +1,7 @@
 const call = async () => {
   return {
     type: "text",
-    value: "dev" ? `${"0.0.0-dev"} (built ${"dev"})` : "0.0.0-dev"
+    value: "dev" ? `${"0.0.0"} (built ${"dev"})` : "0.0.0"
   };
 };
 const version = {

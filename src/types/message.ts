@@ -13,7 +13,9 @@ export type CompletionBoundary = any
 export type GroupedToolUseMessage = any
 export type HookResultMessage = any
 export type Message = any
-export type MessageOrigin = any
+export type MessageOrigin =
+  | { kind: 'coordinator' }
+  | { kind: 'task-notification' }
 export type CompactMetadata = any
 export type CollapsibleMessage = any
 export type SystemAgentsKilledMessage = any
@@ -23,21 +25,25 @@ export type SystemFileSnapshotMessage = any
 export type SystemMicrocompactBoundaryMessage = any
 export type SystemPermissionRetryMessage = any
 export type SystemScheduledTaskFireMessage = any
-export type SystemMessageLevel = any
+export type SystemMessageLevel = 'info' | 'warning' | 'error' | 'suggestion'
 export type NormalizedAssistantMessage<T = any> = any
 export type NormalizedMessage = any
 export type NormalizedUserMessage = any
-export type PartialCompactDirection = any
+export type PartialCompactDirection = 'from' | 'up_to'
 export type ProgressMessage<T = any> = any
 export type RequestStartEvent = any
 export type StreamEvent = any
 export type ToolUseSummaryMessage = any
 export type TombstoneMessage = any
-export type StopHookInfo = any
+export type StopHookInfo = {
+  command: string
+  promptText?: string
+  durationMs?: number
+}
 export type SystemCompactBoundaryMessage = any
 export type SystemLocalCommandMessage = any
 export type SystemInformationalMessage = any
-export type QuerySource = any
+export type QuerySource = string
 export type RenderableMessage = any
 export type SystemAPIErrorMessage = any
 export type SystemBridgeStatusMessage = any

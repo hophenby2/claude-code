@@ -27,7 +27,7 @@ function getTelemetryAttributes() {
     attributes["session.id"] = sessionId;
   }
   if (shouldIncludeAttribute("OTEL_METRICS_INCLUDE_VERSION")) {
-    attributes["app.version"] = "0.0.0-dev";
+    attributes["app.version"] = "0.0.0";
   }
   const oauthAccount = getOauthAccountInfo();
   if (oauthAccount) {

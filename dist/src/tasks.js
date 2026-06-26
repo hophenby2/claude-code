@@ -1,10 +1,12 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { DreamTask } from "./tasks/DreamTask/DreamTask.js";
 import { LocalAgentTask } from "./tasks/LocalAgentTask/LocalAgentTask.js";
 import { LocalShellTask } from "./tasks/LocalShellTask/LocalShellTask.js";
 import { RemoteAgentTask } from "./tasks/RemoteAgentTask/RemoteAgentTask.js";
-const LocalWorkflowTask = false ? null.LocalWorkflowTask : null;
-const MonitorMcpTask = false ? null.MonitorMcpTask : null;
+const LocalWorkflowTask = false ? require2("./tasks/LocalWorkflowTask/LocalWorkflowTask.js").LocalWorkflowTask : null;
+const MonitorMcpTask = false ? require2("./tasks/MonitorMcpTask/MonitorMcpTask.js").MonitorMcpTask : null;
 function getAllTasks() {
   const tasks = [
     LocalShellTask,

@@ -137,7 +137,7 @@ function Feedback({
       platform: env.platform,
       gitRepo: envInfo.isGit,
       terminal: env.terminal,
-      version: "0.0.0-dev",
+      version: "0.0.0",
       transcript: normalizeMessagesForAPI(messages),
       errors: sanitizedErrors,
       lastApiRequest: getLastAPIRequest(),
@@ -262,7 +262,7 @@ function Feedback({
             ", ",
             env.terminal,
             ", v",
-            "0.0.0-dev"
+            "0.0.0"
           ] })
         ] }),
         envInfo.gitState && /* @__PURE__ */ jsxs(Text, { children: [
@@ -313,7 +313,7 @@ ${sanitizedDescription}
 **Environment Info**
 - Platform: ${env.platform}
 - Terminal: ${env.terminal}
-- Version: ${"0.0.0-dev"}
+- Version: ${"0.0.0"}
 - Feedback ID: ${feedbackId}
 
 **Errors**

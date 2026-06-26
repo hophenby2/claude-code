@@ -7,7 +7,7 @@ function shouldShowUpdateNotification(updatedVersion, lastNotifiedSemver) {
   const updatedSemver = getSemverPart(updatedVersion);
   return updatedSemver !== lastNotifiedSemver;
 }
-function useUpdateNotification(updatedVersion, initialVersion = "0.0.0-dev") {
+function useUpdateNotification(updatedVersion, initialVersion = "0.0.0") {
   const [lastNotifiedSemver, setLastNotifiedSemver] = useState(
     () => getSemverPart(initialVersion)
   );

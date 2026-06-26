@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import * as React from "react";
@@ -214,14 +216,14 @@ function MessageImpl(t0) {
       if (false) {
         const {
           isSnipBoundaryMessage
-        } = null;
+        } = require2("../services/compact/snipProjection.js");
         const {
           isSnipMarkerMessage
-        } = null;
+        } = require2("../services/compact/snipCompact.js");
         if (isSnipBoundaryMessage(message)) {
           let t22;
           if ($[65] === /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel")) {
-            t22 = null;
+            t22 = require2("./messages/SnipBoundaryMessage.js");
             $[65] = t22;
           } else {
             t22 = $[65];

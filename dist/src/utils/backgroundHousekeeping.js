@@ -1,9 +1,11 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { initAutoDream } from "../services/autoDream/autoDream.js";
 import { initMagicDocs } from "../services/MagicDocs/magicDocs.js";
 import { initSkillImprovement } from "./hooks/skillImprovement.js";
-const extractMemoriesModule = false ? null : null;
-const registerProtocolModule = false ? null : null;
+const extractMemoriesModule = false ? require2("../services/extractMemories/extractMemories.js") : null;
+const registerProtocolModule = false ? require2("./deepLink/registerProtocol.js") : null;
 import { getIsInteractive, getLastInteractionTime } from "../bootstrap/state.js";
 import {
   cleanupNpmCacheForAnthropicPackages,

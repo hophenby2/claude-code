@@ -175,7 +175,7 @@ const getClaudeTempDir = memoize(function getClaudeTempDir2() {
 const getBundledSkillsRoot = memoize(
   function getBundledSkillsRoot2() {
     const nonce = randomBytes(16).toString("hex");
-    return join(getClaudeTempDir(), "bundled-skills", "0.0.0-dev", nonce);
+    return join(getClaudeTempDir(), "bundled-skills", "0.0.0", nonce);
   }
 );
 function getProjectTempDir() {

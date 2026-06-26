@@ -64,7 +64,7 @@ import {
 import { getSettings_DEPRECATED } from "./settings/settings.js";
 import { jsonParse, jsonStringify } from "./slowOperations.js";
 import { validateUuid } from "./uuid.js";
-const VERSION = typeof MACRO !== "undefined" ? "0.0.0-dev" : "unknown";
+const VERSION = typeof MACRO !== "undefined" ? "0.0.0" : "unknown";
 const MAX_TOMBSTONE_REWRITE_BYTES = 50 * 1024 * 1024;
 const SKIP_FIRST_PROMPT_PATTERN = /^(?:\s*<[a-z][\w-]*[\s>]|\[Request interrupted by user[^\]]*\])/;
 function isTranscriptMessage(entry) {

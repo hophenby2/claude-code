@@ -26,7 +26,7 @@ import { gte } from "../utils/semver.js";
 import { getInitialSettings } from "../utils/settings/settings.js";
 async function update() {
   logEvent("tengu_update_check", {});
-  writeToStdout(`Current version: ${"0.0.0-dev"}
+  writeToStdout(`Current version: ${"0.0.0"}
 `);
   const channel = getInitialSettings()?.autoUpdatesChannel ?? "latest";
   writeToStdout(`Checking for updates to ${channel} version...
@@ -96,8 +96,8 @@ async function update() {
     if (packageManager === "homebrew") {
       writeToStdout("Claude is managed by Homebrew.\n");
       const latest = await getLatestVersion(channel);
-      if (latest && !gte("0.0.0-dev", latest)) {
-        writeToStdout(`Update available: ${"0.0.0-dev"} \u2192 ${latest}
+      if (latest && !gte("0.0.0", latest)) {
+        writeToStdout(`Update available: ${"0.0.0"} \u2192 ${latest}
 `);
         writeToStdout("\n");
         writeToStdout("To update, run:\n");
@@ -108,8 +108,8 @@ async function update() {
     } else if (packageManager === "winget") {
       writeToStdout("Claude is managed by winget.\n");
       const latest = await getLatestVersion(channel);
-      if (latest && !gte("0.0.0-dev", latest)) {
-        writeToStdout(`Update available: ${"0.0.0-dev"} \u2192 ${latest}
+      if (latest && !gte("0.0.0", latest)) {
+        writeToStdout(`Update available: ${"0.0.0"} \u2192 ${latest}
 `);
         writeToStdout("\n");
         writeToStdout("To update, run:\n");
@@ -122,8 +122,8 @@ async function update() {
     } else if (packageManager === "apk") {
       writeToStdout("Claude is managed by apk.\n");
       const latest = await getLatestVersion(channel);
-      if (latest && !gte("0.0.0-dev", latest)) {
-        writeToStdout(`Update available: ${"0.0.0-dev"} \u2192 ${latest}
+      if (latest && !gte("0.0.0", latest)) {
+        writeToStdout(`Update available: ${"0.0.0"} \u2192 ${latest}
 `);
         writeToStdout("\n");
         writeToStdout("To update, run:\n");
@@ -189,14 +189,14 @@ async function update() {
         process.stderr.write("Failed to check for updates\n");
         await gracefulShutdown(1);
       }
-      if (result.latestVersion === "0.0.0-dev") {
+      if (result.latestVersion === "0.0.0") {
         writeToStdout(
-          chalk.green(`Claude Code is up to date (${"0.0.0-dev"})`) + "\n"
+          chalk.green(`Claude Code is up to date (${"0.0.0"})`) + "\n"
         );
       } else {
         writeToStdout(
           chalk.green(
-            `Successfully updated from ${"0.0.0-dev"} to version ${result.latestVersion}`
+            `Successfully updated from ${"0.0.0"} to version ${result.latestVersion}`
           ) + "\n"
         );
         await regenerateCompletionCache();
@@ -247,14 +247,14 @@ async function update() {
     process.stderr.write("  \u2022 Check if you need to login: npm whoami\n");
     await gracefulShutdown(1);
   }
-  if (latestVersion === "0.0.0-dev") {
+  if (latestVersion === "0.0.0") {
     writeToStdout(
-      chalk.green(`Claude Code is up to date (${"0.0.0-dev"})`) + "\n"
+      chalk.green(`Claude Code is up to date (${"0.0.0"})`) + "\n"
     );
     await gracefulShutdown(0);
   }
   writeToStdout(
-    `New version available: ${latestVersion} (current: ${"0.0.0-dev"})
+    `New version available: ${latestVersion} (current: ${"0.0.0"})
 `
   );
   writeToStdout("Installing update...\n");
@@ -308,7 +308,7 @@ async function update() {
     case "success":
       writeToStdout(
         chalk.green(
-          `Successfully updated from ${"0.0.0-dev"} to version ${latestVersion}`
+          `Successfully updated from ${"0.0.0"} to version ${latestVersion}`
         ) + "\n"
       );
       await regenerateCompletionCache();

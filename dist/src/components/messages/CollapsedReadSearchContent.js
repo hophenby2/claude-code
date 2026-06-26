@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { basename } from "path";
@@ -16,7 +18,7 @@ import { CtrlOToExpand } from "../CtrlOToExpand.js";
 import { useSelectedMessageBg } from "../messageActions.js";
 import { PrBadge } from "../PrBadge.js";
 import { ToolUseLoader } from "../ToolUseLoader.js";
-const teamMemCollapsed = false ? null : null;
+const teamMemCollapsed = false ? require2("./teamMemCollapsed.js") : null;
 const MIN_HINT_DISPLAY_MS = 700;
 function VerboseToolUse(t0) {
   const $ = _c(24);

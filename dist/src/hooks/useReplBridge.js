@@ -1,4 +1,6 @@
 import "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { useCallback, useEffect, useRef } from "react";
 import "../bootstrap/state.js";
@@ -270,7 +272,7 @@ function useReplBridge(messages, setMessages, abortControllerRef, commands, main
               if (false) {
                 const {
                   sanitizeInboundWebhookContent
-                } = null;
+                } = require2("../bridge/webhookSanitizer.js");
                 sanitized = sanitizeInboundWebhookContent(fields.content);
               }
               const content = await resolveAndPrepend(msg, sanitized);

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { chmod, open, rename, stat, unlink } from "fs/promises";
 import mapValues from "lodash-es/mapValues.js";
@@ -965,7 +967,7 @@ function areMcpConfigsAllowedWithEnterpriseMcpConfig(configs) {
     (c) => c.type === "sdk" && c.name === "claude-vscode"
   );
 }
-const DEFAULT_DISABLED_BUILTIN = false ? null.COMPUTER_USE_MCP_SERVER_NAME : null;
+const DEFAULT_DISABLED_BUILTIN = false ? require2("../../utils/computerUse/common.js").COMPUTER_USE_MCP_SERVER_NAME : null;
 function isDefaultDisabledBuiltin(name) {
   return DEFAULT_DISABLED_BUILTIN !== null && name === DEFAULT_DISABLED_BUILTIN;
 }

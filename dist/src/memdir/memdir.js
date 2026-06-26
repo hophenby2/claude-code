@@ -1,8 +1,10 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { join } from "path";
 import { getFsImplementation } from "../utils/fsOperations.js";
 import { getAutoMemPath, isAutoMemoryEnabled } from "./paths.js";
-const teamMemPaths = false ? null : null;
+const teamMemPaths = false ? require2("./teamMemPaths.js") : null;
 import { getOriginalCwd } from "../bootstrap/state.js";
 import { getFeatureValue_CACHED_MAY_BE_STALE } from "../services/analytics/growthbook.js";
 import {
@@ -59,7 +61,7 @@ function truncateEntrypointContent(raw) {
     wasByteTruncated
   };
 }
-const teamMemPrompts = false ? null : null;
+const teamMemPrompts = false ? require2("./teamMemPrompts.js") : null;
 const DIR_EXISTS_GUIDANCE = "This directory already exists \u2014 write to it directly with the Write tool (do not run mkdir or check for its existence).";
 const DIRS_EXIST_GUIDANCE = "Both directories already exist \u2014 write to them directly with the Write tool (do not run mkdir or check for their existence).";
 async function ensureMemoryDirExists(memoryDir) {

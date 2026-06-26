@@ -1,4 +1,6 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 import { useState } from "react";
 import { getAllowedChannels, getHasDevChannels } from "../../bootstrap/state.js";

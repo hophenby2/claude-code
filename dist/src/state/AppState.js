@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import React, { useContext, useEffect, useEffectEvent, useState, useSyncExternalStore } from "react";
@@ -8,7 +10,7 @@ import { logForDebugging } from "../utils/debug.js";
 import { createDisabledBypassPermissionsContext, isBypassPermissionsModeDisabled } from "../utils/permissions/permissionSetup.js";
 import { applySettingsChange } from "../utils/settings/applySettingsChange.js";
 import { createStore } from "./store.js";
-const VoiceProvider = false ? null.VoiceProvider : ({
+const VoiceProvider = false ? require2("../context/voice.js").VoiceProvider : ({
   children
 }) => children;
 import { getDefaultAppState } from "./AppStateStore.js";

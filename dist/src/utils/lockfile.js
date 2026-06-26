@@ -1,7 +1,9 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 let _lockfile;
 function getLockfile() {
   if (!_lockfile) {
-    _lockfile = require("proper-lockfile");
+    _lockfile = require2("proper-lockfile");
   }
   return _lockfile;
 }

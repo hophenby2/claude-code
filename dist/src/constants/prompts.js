@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { getAntModelOverrideConfig } from "../utils/model/antModels.js";
 import { type as osType, version as osVersion, release as osRelease } from "os";
 import { env } from "../utils/env.js";
@@ -53,14 +55,14 @@ import "../utils/debug.js";
 import { loadMemoryPrompt } from "../memdir/memdir.js";
 import { isUndercover } from "../utils/undercover.js";
 import { isMcpInstructionsDeltaEnabled } from "../utils/mcpInstructionsDelta.js";
-const getCachedMCConfigForFRC = false ? null.getCachedMCConfig : null;
-const proactiveModule = false ? null : null;
-const BRIEF_PROACTIVE_SECTION = false ? null.BRIEF_PROACTIVE_SECTION : null;
-const briefToolModule = false ? null : null;
+const getCachedMCConfigForFRC = false ? require2("../services/compact/cachedMCConfig.js").getCachedMCConfig : null;
+const proactiveModule = false ? require2("../proactive/index.js") : null;
+const BRIEF_PROACTIVE_SECTION = false ? require2("../tools/BriefTool/prompt.js").BRIEF_PROACTIVE_SECTION : null;
+const briefToolModule = false ? require2("../tools/BriefTool/BriefTool.js") : null;
 const DISCOVER_SKILLS_TOOL_NAME = feature(
   "EXPERIMENTAL_SKILL_SEARCH"
-) ? require("../tools/DiscoverSkillsTool/prompt.js").DISCOVER_SKILLS_TOOL_NAME : null;
-const skillSearchFeatureCheck = false ? null : null;
+) ? require2("../tools/DiscoverSkillsTool/prompt.js").DISCOVER_SKILLS_TOOL_NAME : null;
+const skillSearchFeatureCheck = false ? require2("../services/skillSearch/featureCheck.js") : null;
 import { CYBER_RISK_INSTRUCTION } from "./cyberRiskInstruction.js";
 const CLAUDE_CODE_DOCS_MAP_URL = "https://code.claude.com/docs/en/claude_code_docs_map.md";
 const SYSTEM_PROMPT_DYNAMIC_BOUNDARY = "__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__";

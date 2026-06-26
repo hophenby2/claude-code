@@ -300,7 +300,7 @@ async function initializeBetaTracing(resource) {
   setLoggerProvider(loggerProvider);
   const eventLogger = logs.getLogger(
     "com.anthropic.claude_code.events",
-    "0.0.0-dev"
+    "0.0.0"
   );
   setEventLogger(eventLogger);
   process.on("beforeExit", async () => {
@@ -343,7 +343,7 @@ async function initializeTelemetry() {
   const platform = getPlatform();
   const baseAttributes = {
     [ATTR_SERVICE_NAME]: "claude-code",
-    [ATTR_SERVICE_VERSION]: "0.0.0-dev"
+    [ATTR_SERVICE_VERSION]: "0.0.0"
   };
   if (platform === "wsl") {
     const wslVersion = getWslVersion();
@@ -401,7 +401,7 @@ async function initializeTelemetry() {
       }
     };
     registerCleanup(shutdownTelemetry2);
-    return meterProvider2.getMeter("com.anthropic.claude_code", "0.0.0-dev");
+    return meterProvider2.getMeter("com.anthropic.claude_code", "0.0.0");
   }
   const meterProvider = new MeterProvider({
     resource,
@@ -430,7 +430,7 @@ async function initializeTelemetry() {
       setLoggerProvider(loggerProvider);
       const eventLogger = logs.getLogger(
         "com.anthropic.claude_code.events",
-        "0.0.0-dev"
+        "0.0.0"
       );
       setEventLogger(eventLogger);
       logForDebugging("[3P telemetry] Event logger set successfully");
@@ -502,7 +502,7 @@ Current timeout: ${timeoutMs}ms
     }
   };
   registerCleanup(shutdownTelemetry);
-  return meterProvider.getMeter("com.anthropic.claude_code", "0.0.0-dev");
+  return meterProvider.getMeter("com.anthropic.claude_code", "0.0.0");
 }
 async function flushTelemetry() {
   const meterProvider = getMeterProvider();

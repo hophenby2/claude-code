@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomUUID } from "crypto";
 import last from "lodash-es/last.js";
@@ -59,7 +61,7 @@ import { resolveThemeSetting } from "./utils/systemTheme.js";
 import {
   shouldEnableThinkingByDefault
 } from "./utils/thinking.js";
-const messageSelector = () => require("./components/MessageSelector.js");
+const messageSelector = () => require2("./components/MessageSelector.js");
 import {
   localCommandOutputToSDKAssistantMessage,
   toSDKCompactMetadata
@@ -77,9 +79,9 @@ import {
   isResultSuccessful,
   normalizeMessage
 } from "./utils/queryHelpers.js";
-const getCoordinatorUserContext = false ? null.getCoordinatorUserContext : () => ({});
-const snipModule = false ? null : null;
-const snipProjection = false ? null : null;
+const getCoordinatorUserContext = false ? require2("./coordinator/coordinatorMode.js").getCoordinatorUserContext : () => ({});
+const snipModule = false ? require2("./services/compact/snipCompact.js") : null;
+const snipProjection = false ? require2("./services/compact/snipProjection.js") : null;
 class QueryEngine {
   config;
   mutableMessages;

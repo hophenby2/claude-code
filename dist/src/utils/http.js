@@ -13,7 +13,7 @@ function getUserAgent() {
   const clientApp = process.env.CLAUDE_AGENT_SDK_CLIENT_APP ? `, client-app/${process.env.CLAUDE_AGENT_SDK_CLIENT_APP}` : "";
   const workload = getWorkload();
   const workloadSuffix = workload ? `, workload/${workload}` : "";
-  return `claude-cli/${"0.0.0-dev"} (${process.env.USER_TYPE}, ${process.env.CLAUDE_CODE_ENTRYPOINT ?? "cli"}${agentSdkVersion}${clientApp}${workloadSuffix})`;
+  return `claude-cli/${"0.0.0"} (${process.env.USER_TYPE}, ${process.env.CLAUDE_CODE_ENTRYPOINT ?? "cli"}${agentSdkVersion}${clientApp}${workloadSuffix})`;
 }
 function getMCPUserAgent() {
   const parts = [];
@@ -27,7 +27,7 @@ function getMCPUserAgent() {
     parts.push(`client-app/${process.env.CLAUDE_AGENT_SDK_CLIENT_APP}`);
   }
   const suffix = parts.length > 0 ? ` (${parts.join(", ")})` : "";
-  return `claude-code/${"0.0.0-dev"}${suffix}`;
+  return `claude-code/${"0.0.0"}${suffix}`;
 }
 function getWebFetchUserAgent() {
   return `Claude-User (${getClaudeCodeUserAgent()}; +https://support.anthropic.com/)`;

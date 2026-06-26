@@ -35,7 +35,7 @@ async function submitTranscriptShare(messages, trigger, appearanceId) {
     }
     const data = {
       trigger,
-      version: "0.0.0-dev",
+      version: "0.0.0",
       platform: process.platform,
       transcript,
       subagentTranscripts: Object.keys(subagentTranscripts).length > 0 ? subagentTranscripts : void 0,

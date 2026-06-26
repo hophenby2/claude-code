@@ -13,7 +13,7 @@ if (false) {
 async function main() {
   const args = process.argv.slice(2);
   if (args.length === 1 && (args[0] === "--version" || args[0] === "-v" || args[0] === "-V")) {
-    console.log(`${"0.0.0-dev"} (Claude Code)`);
+    console.log(`${"0.0.0"} (Claude Code)`);
     return;
   }
   const {

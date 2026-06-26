@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { shouldAutoEnableClaudeInChrome } from "../../utils/claudeInChrome/setup.js";
 import { registerBatchSkill } from "./batch.js";
@@ -23,32 +25,32 @@ function initBundledSkills() {
   registerBatchSkill();
   registerStuckSkill();
   if (false) {
-    const { registerDreamSkill } = null;
+    const { registerDreamSkill } = require2("./dream.js");
     registerDreamSkill();
   }
   if (false) {
-    const { registerHunterSkill } = null;
+    const { registerHunterSkill } = require2("./hunter.js");
     registerHunterSkill();
   }
   if (false) {
-    const { registerLoopSkill } = null;
+    const { registerLoopSkill } = require2("./loop.js");
     registerLoopSkill();
   }
   if (false) {
     const {
       registerScheduleRemoteAgentsSkill
-    } = null;
+    } = require2("./scheduleRemoteAgents.js");
     registerScheduleRemoteAgentsSkill();
   }
   if (false) {
-    const { registerClaudeApiSkill } = null;
+    const { registerClaudeApiSkill } = require2("./claudeApi.js");
     registerClaudeApiSkill();
   }
   if (shouldAutoEnableClaudeInChrome()) {
     registerClaudeInChromeSkill();
   }
   if (false) {
-    const { registerRunSkillGeneratorSkill } = null;
+    const { registerRunSkillGeneratorSkill } = require2("./runSkillGenerator.js");
     registerRunSkillGeneratorSkill();
   }
 }

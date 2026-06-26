@@ -1,4 +1,6 @@
 import { jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { dirname } from "path";
@@ -152,13 +154,13 @@ function ResumeConversation({
         throw new Error("Failed to load conversation");
       }
       if (false) {
-        const coordinatorModule = null;
+        const coordinatorModule = require2("../coordinator/coordinatorMode.js");
         const warning = coordinatorModule.matchSessionMode(result_3.mode);
         if (warning) {
           const {
             getAgentDefinitionsWithOverrides,
             getActiveAgentsFromList
-          } = null;
+          } = require2("../tools/AgentTool/loadAgentsDir.js");
           getAgentDefinitionsWithOverrides.cache.clear?.();
           const freshAgentDefs = await getAgentDefinitionsWithOverrides(getOriginalCwd());
           setAppState((prev_0) => ({
@@ -190,10 +192,10 @@ function ResumeConversation({
       if (false) {
         const {
           saveMode
-        } = null;
+        } = require2("../utils/sessionStorage.js");
         const {
           isCoordinatorMode
-        } = null;
+        } = require2("../coordinator/coordinatorMode.js");
         saveMode(isCoordinatorMode() ? "coordinator" : "normal");
       }
       const standaloneAgentContext = computeStandaloneAgentContext(result_3.agentName, result_3.agentColor);
@@ -216,7 +218,7 @@ function ResumeConversation({
       }
       if (false) {
         ;
-        null.restoreFromEntries(result_3.contextCollapseCommits ?? [], result_3.contextCollapseSnapshot);
+        require2("../services/contextCollapse/persist.js").restoreFromEntries(result_3.contextCollapseCommits ?? [], result_3.contextCollapseSnapshot);
       }
       logEvent("tengu_session_resumed", {
         entrypoint: "picker",

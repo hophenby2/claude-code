@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomBytes } from "crypto";
 import { unwatchFile, watchFile } from "fs";
@@ -24,8 +26,8 @@ import { logError } from "./log.js";
 import { normalizePathForConfigKey } from "./path.js";
 import { getEssentialTrafficOnlyReason } from "./privacyLevel.js";
 import { getManagedFilePath } from "./settings/managedPath.js";
-const teamMemPaths = false ? null : null;
-const ccrAutoConnect = false ? null : null;
+const teamMemPaths = false ? require2("../memdir/teamMemPaths.js") : null;
+const ccrAutoConnect = false ? require2("../bridge/bridgeEnabled.js") : null;
 import { jsonParse, jsonStringify } from "./slowOperations.js";
 let insideGetConfig = false;
 const DEFAULT_PROJECT_CONFIG = {

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { normalize, posix, win32 } from "path";
 import {
@@ -12,7 +14,7 @@ import {
   posixPathToWindowsPath,
   windowsPathToPosixPath
 } from "./windowsPaths.js";
-const teamMemPaths = false ? null : null;
+const teamMemPaths = false ? require2("../memdir/teamMemPaths.js") : null;
 const IS_WINDOWS = process.platform === "win32";
 function toPosix(p) {
   return p.split(win32.sep).join(posix.sep);

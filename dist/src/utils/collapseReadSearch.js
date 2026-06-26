@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { findToolByName } from "../Tool.js";
 import { extractBashCommentLabel } from "../tools/BashTool/commentLabel.js";
@@ -18,8 +20,8 @@ import {
   isMemoryDirectory,
   isShellCommandTargetingMemory
 } from "./memoryFileDetection.js";
-const teamMemOps = false ? null : null;
-const SNIP_TOOL_NAME = false ? null.SNIP_TOOL_NAME : null;
+const teamMemOps = false ? require2("./teamMemoryOps.js") : null;
+const SNIP_TOOL_NAME = false ? require2("../tools/SnipTool/prompt.js").SNIP_TOOL_NAME : null;
 function getFilePathFromToolInput(toolInput) {
   const input = toolInput;
   return input?.file_path ?? input?.path;

@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { spawn, spawnSync } from "child_process";
 import { readFile } from "fs/promises";
 import { logForDebugging } from "../utils/debug.js";

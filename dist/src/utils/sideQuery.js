@@ -47,7 +47,7 @@ async function sideQuery(opts) {
     betas.push(STRUCTURED_OUTPUTS_BETA_HEADER);
   }
   const messageText = extractFirstUserMessageText(messages);
-  const fingerprint = computeFingerprint(messageText, "0.0.0-dev");
+  const fingerprint = computeFingerprint(messageText, "0.0.0");
   const attributionHeader = getAttributionHeader(fingerprint);
   const systemBlocks = [
     attributionHeader ? { type: "text", text: attributionHeader } : null,

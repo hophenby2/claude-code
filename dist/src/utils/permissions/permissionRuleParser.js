@@ -1,8 +1,10 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { AGENT_TOOL_NAME } from "../../tools/AgentTool/constants.js";
 import { TASK_OUTPUT_TOOL_NAME } from "../../tools/TaskOutputTool/constants.js";
 import { TASK_STOP_TOOL_NAME } from "../../tools/TaskStopTool/prompt.js";
-const BRIEF_TOOL_NAME = false ? null.BRIEF_TOOL_NAME : null;
+const BRIEF_TOOL_NAME = false ? require2("../../tools/BriefTool/prompt.js").BRIEF_TOOL_NAME : null;
 const LEGACY_TOOL_NAME_ALIASES = {
   Task: AGENT_TOOL_NAME,
   KillShell: TASK_STOP_TOOL_NAME,

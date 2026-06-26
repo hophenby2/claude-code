@@ -31,7 +31,7 @@ async function startMCPServer(cwd, debug, verbose) {
   const server = new Server(
     {
       name: "claude/tengu",
-      version: "0.0.0-dev"
+      version: "0.0.0"
     },
     {
       capabilities: {

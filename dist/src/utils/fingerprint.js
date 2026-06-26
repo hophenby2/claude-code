@@ -26,7 +26,7 @@ function computeFingerprint(messageText, version) {
 }
 function computeFingerprintFromMessages(messages) {
   const firstMessageText = extractFirstMessageText(messages);
-  return computeFingerprint(firstMessageText, "0.0.0-dev");
+  return computeFingerprint(firstMessageText, "0.0.0");
 }
 export {
   FINGERPRINT_SALT,

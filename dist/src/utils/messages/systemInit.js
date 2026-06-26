@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { randomUUID } from "crypto";
 import { getSdkBetas, getSessionId } from "../../bootstrap/state.js";
@@ -31,7 +33,7 @@ function buildSystemInitMessage(inputs) {
     slash_commands: inputs.commands.filter((c) => c.userInvocable !== false).map((c) => c.name),
     apiKeySource: getAnthropicApiKeyWithSource().source,
     betas: getSdkBetas(),
-    claude_code_version: "0.0.0-dev",
+    claude_code_version: "0.0.0",
     output_style: outputStyle,
     agents: inputs.agents.map((agent) => agent.agentType),
     skills: inputs.skills.filter((s) => s.userInvocable !== false).map((skill) => skill.name),
@@ -44,7 +46,7 @@ function buildSystemInitMessage(inputs) {
   };
   if (false) {
     ;
-    initMessage.messaging_socket_path = null.getUdsMessagingSocketPath();
+    initMessage.messaging_socket_path = require2("../udsMessaging.js").getUdsMessagingSocketPath();
   }
   initMessage.fast_mode_state = getFastModeState(inputs.model, inputs.fastMode);
   return initMessage;

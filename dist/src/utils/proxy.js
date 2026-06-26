@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import memoize from "lodash-es/memoize.js";
@@ -101,7 +103,7 @@ function createAxiosInstance(extra = {}) {
   return instance;
 }
 const getProxyAgent = memoize((uri) => {
-  const undiciMod = require("undici");
+  const undiciMod = require2("undici");
   const mtlsConfig = getMTLSConfig();
   const caCerts = getCACertificates();
   const proxyOptions = {
@@ -190,7 +192,7 @@ function configureGlobalAgents() {
       }
       return config;
     });
-    require("undici").setGlobalDispatcher(
+    require2("undici").setGlobalDispatcher(
       getProxyAgent(proxyUrl)
     );
   } else if (mtlsAgent) {
@@ -198,7 +200,7 @@ function configureGlobalAgents() {
     const mtlsOptions = getTLSFetchOptions();
     if (mtlsOptions.dispatcher) {
       ;
-      require("undici").setGlobalDispatcher(
+      require2("undici").setGlobalDispatcher(
         mtlsOptions.dispatcher
       );
     }

@@ -112,7 +112,7 @@ async function captureMemoryDiagnostics(trigger, dumpNumber = 0) {
     smapsRollup,
     platform: process.platform,
     nodeVersion: process.version,
-    ccVersion: "0.0.0-dev"
+    ccVersion: "0.0.0"
   };
 }
 async function performHeapDump(trigger = "manual", dumpNumber = 0) {

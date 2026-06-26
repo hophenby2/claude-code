@@ -1,4 +1,6 @@
 import { jsx } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { EnterPlanModeTool } from "../../tools/EnterPlanModeTool/EnterPlanModeTool.js";
@@ -28,12 +30,12 @@ import { NotebookEditPermissionRequest } from "./NotebookEditPermissionRequest/N
 import { PowerShellPermissionRequest } from "./PowerShellPermissionRequest/PowerShellPermissionRequest.js";
 import { SkillPermissionRequest } from "./SkillPermissionRequest/SkillPermissionRequest.js";
 import { WebFetchPermissionRequest } from "./WebFetchPermissionRequest/WebFetchPermissionRequest.js";
-const ReviewArtifactTool = false ? null.ReviewArtifactTool : null;
-const ReviewArtifactPermissionRequest = false ? null.ReviewArtifactPermissionRequest : null;
-const WorkflowTool = false ? null.WorkflowTool : null;
-const WorkflowPermissionRequest = false ? null.WorkflowPermissionRequest : null;
-const MonitorTool = false ? null.MonitorTool : null;
-const MonitorPermissionRequest = false ? null.MonitorPermissionRequest : null;
+const ReviewArtifactTool = false ? require2("../../tools/ReviewArtifactTool/ReviewArtifactTool.js").ReviewArtifactTool : null;
+const ReviewArtifactPermissionRequest = false ? require2("./ReviewArtifactPermissionRequest/ReviewArtifactPermissionRequest.js").ReviewArtifactPermissionRequest : null;
+const WorkflowTool = false ? require2("../../tools/WorkflowTool/WorkflowTool.js").WorkflowTool : null;
+const WorkflowPermissionRequest = false ? require2("../../tools/WorkflowTool/WorkflowPermissionRequest.js").WorkflowPermissionRequest : null;
+const MonitorTool = false ? require2("../../tools/MonitorTool/MonitorTool.js").MonitorTool : null;
+const MonitorPermissionRequest = false ? require2("./MonitorPermissionRequest/MonitorPermissionRequest.js").MonitorPermissionRequest : null;
 function permissionComponentForTool(tool) {
   switch (tool) {
     case FileEditTool:

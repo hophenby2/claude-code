@@ -66,12 +66,12 @@ function NativeAutoUpdater({
     logEvent("tengu_native_auto_updater_start", {});
     try {
       const maxVersion = await getMaxVersion();
-      if (maxVersion && gt("0.0.0-dev", maxVersion)) {
+      if (maxVersion && gt("0.0.0", maxVersion)) {
         const msg = await getMaxVersionMessage();
         setMaxVersionIssue(msg ?? "affects your version");
       }
       const result = await installLatest(channel);
-      const currentVersion = "0.0.0-dev";
+      const currentVersion = "0.0.0";
       const latencyMs = Date.now() - startTime;
       if (result.lockFailed) {
         logEvent("tengu_native_auto_updater_lock_contention", {

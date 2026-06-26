@@ -1,4 +1,6 @@
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 import { c as _c } from "react/compiler-runtime";
 const feature = (_name) => false;
 import { useEffect, useState } from "react";
@@ -27,7 +29,7 @@ import { MemoryUsageIndicator } from "../MemoryUsageIndicator.js";
 import { SentryErrorBoundary } from "../SentryErrorBoundary.js";
 import { TokenWarning } from "../TokenWarning.js";
 import { SandboxPromptFooterHint } from "./SandboxPromptFooterHint.js";
-const VoiceIndicator = false ? null.VoiceIndicator : () => null;
+const VoiceIndicator = false ? require2("./VoiceIndicator.js").VoiceIndicator : () => null;
 const FOOTER_TEMPORARY_STATUS_TIMEOUT = 5e3;
 function Notifications(t0) {
   const $ = _c(34);

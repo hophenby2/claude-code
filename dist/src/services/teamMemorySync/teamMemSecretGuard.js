@@ -1,8 +1,10 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 function checkTeamMemSecrets(filePath, content) {
   if (false) {
-    const { isTeamMemPath } = null;
-    const { scanForSecrets } = null;
+    const { isTeamMemPath } = require2("../../memdir/teamMemPaths.js");
+    const { scanForSecrets } = require2("./secretScanner.js");
     if (!isTeamMemPath(filePath)) {
       return null;
     }

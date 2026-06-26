@@ -1,3 +1,5 @@
+import { createRequire as __createRequire } from "node:module";
+const require2 = __createRequire(import.meta.url);
 const feature = (_name) => false;
 import { clearSystemPromptSections } from "../../constants/systemPromptSections.js";
 import { getUserContext } from "../../context.js";
@@ -13,7 +15,7 @@ function runPostCompactCleanup(querySource) {
   if (false) {
     if (isMainThreadCompact) {
       ;
-      null.resetContextCollapse();
+      require2("../contextCollapse/index.js").resetContextCollapse();
     }
   }
   if (isMainThreadCompact) {
