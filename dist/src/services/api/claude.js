@@ -37,6 +37,10 @@ import { errorMessage } from "../../utils/errors.js";
 import { computeFingerprintFromMessages } from "../../utils/fingerprint.js";
 import { captureAPIRequest, logError } from "../../utils/log.js";
 import {
+  logModelCommunicationEvent,
+  shouldLogFullStreamDeltas
+} from "../../utils/modelCommunicationLog.js";
+import {
   createAssistantAPIErrorMessage,
   createUserMessage,
   ensureToolResultPairing,
@@ -506,6 +510,79 @@ function getNonstreamingFallbackTimeoutMs() {
   if (override) return override;
   return isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) ? 12e4 : 3e5;
 }
+function summarizeModelCommunicationStreamEvent(part) {
+  if (shouldLogFullStreamDeltas()) return part;
+  switch (part.type) {
+    case "message_start":
+      return {
+        type: part.type,
+        message: part.message ? {
+          id: part.message.id,
+          model: part.message.model,
+          role: part.message.role,
+          stop_reason: part.message.stop_reason,
+          usage: part.message.usage,
+          contentLength: part.message.content?.length
+        } : void 0
+      };
+    case "content_block_start":
+      return {
+        type: part.type,
+        index: part.index,
+        content_block: summarizeStreamContentBlock(part.content_block)
+      };
+    case "content_block_delta":
+      return {
+        type: part.type,
+        index: part.index,
+        delta: summarizeStreamDelta(part.delta)
+      };
+    case "content_block_stop":
+      return { type: part.type, index: part.index };
+    case "message_delta":
+      return {
+        type: part.type,
+        delta: part.delta,
+        usage: part.usage
+      };
+    case "message_stop":
+      return { type: part.type };
+    default:
+      return { type: part.type, event: part };
+  }
+}
+function summarizeStreamContentBlock(block) {
+  if (!block || typeof block !== "object") return block;
+  const record = block;
+  return {
+    type: record.type,
+    id: record.id,
+    name: record.name,
+    text: summarizeText(record.text),
+    thinking: summarizeText(record.thinking),
+    inputType: record.input === void 0 ? void 0 : typeof record.input,
+    hasSignature: typeof record.signature === "string" && record.signature.length > 0
+  };
+}
+function summarizeStreamDelta(delta) {
+  if (!delta || typeof delta !== "object") return delta;
+  const record = delta;
+  return {
+    type: record.type,
+    text: summarizeText(record.text),
+    partial_json: summarizeText(record.partial_json),
+    thinking: summarizeText(record.thinking),
+    connector_text: summarizeText(record.connector_text),
+    signatureLength: typeof record.signature === "string" ? record.signature.length : void 0
+  };
+}
+function summarizeText(value) {
+  if (typeof value !== "string") return void 0;
+  return {
+    chars: value.length,
+    preview: value.slice(0, 500)
+  };
+}
 async function* executeNonStreamingRequest(clientOptions, retryOptions, paramsFromContext, onAttempt, captureRequest, originatingRequestId) {
   const fallbackTimeoutMs = getNonstreamingFallbackTimeoutMs();
   const generator = withRetry(
@@ -524,17 +601,32 @@ async function* executeNonStreamingRequest(clientOptions, retryOptions, paramsFr
         retryParams,
         MAX_NON_STREAMING_TOKENS
       );
-      try {
-        return await anthropic.beta.messages.create(
-          {
-            ...adjustedParams,
-            model: normalizeModelStringForAPI(adjustedParams.model)
-          },
-          {
-            signal: retryOptions.signal,
+      const apiParams = {
+        ...adjustedParams,
+        model: normalizeModelStringForAPI(adjustedParams.model)
+      };
+      logModelCommunicationEvent({
+        direction: "outgoing",
+        stage: "api_request",
+        source: "claude.ts:non_streaming_messages_create",
+        requestId: originatingRequestId,
+        model: apiParams.model,
+        querySource: retryOptions.querySource,
+        payload: {
+          params: apiParams,
+          requestOptions: {
+            hasSignal: true,
             timeout: fallbackTimeoutMs
-          }
-        );
+          },
+          attempt,
+          originatingRequestId
+        }
+      });
+      try {
+        return await anthropic.beta.messages.create(apiParams, {
+          signal: retryOptions.signal,
+          timeout: fallbackTimeoutMs
+        });
       } catch (err) {
         if (err instanceof APIUserAbortError) throw err;
         logForDiagnosticsNoPII("error", "cli_nonstreaming_fallback_error");
@@ -1130,6 +1222,21 @@ ${deferredToolList}
           headlessProfilerCheckpoint("api_request_sent");
         }
         clientRequestId = getAPIProvider() === "firstParty" && isFirstPartyAnthropicBaseUrl() ? randomUUID() : void 0;
+        logModelCommunicationEvent({
+          direction: "outgoing",
+          stage: "api_request",
+          source: "claude.ts:streaming_messages_create",
+          requestId: clientRequestId,
+          model: params.model,
+          querySource: options.querySource,
+          payload: {
+            params: { ...params, stream: true },
+            requestOptions: {
+              hasSignal: true,
+              hasClientRequestId: !!clientRequestId
+            }
+          }
+        });
         const result = await anthropic.beta.messages.create(
           { ...params, stream: true },
           {
@@ -1185,9 +1292,21 @@ ${deferredToolList}
       const STALL_THRESHOLD_MS = 3e4;
       let totalStallTime = 0;
       let stallCount = 0;
+      let modelCommunicationStreamSequence = 0;
       for await (const part of stream) {
         resetStreamIdleTimer();
         const now = Date.now();
+        modelCommunicationStreamSequence++;
+        logModelCommunicationEvent({
+          direction: "incoming",
+          stage: "api_stream_event",
+          source: "claude.ts:raw_stream",
+          requestId: streamRequestId ?? clientRequestId,
+          sequence: modelCommunicationStreamSequence,
+          model: options.model,
+          querySource: options.querySource,
+          payload: summarizeModelCommunicationStreamEvent(part)
+        });
         if (lastEventTime !== null) {
           const timeSinceLastEvent = now - lastEventTime;
           if (timeSinceLastEvent > STALL_THRESHOLD_MS) {
@@ -1382,14 +1501,28 @@ ${deferredToolList}
               });
               throw new Error("Message not found");
             }
+            const normalizedContent = normalizeContentFromAPI(
+              [contentBlock],
+              tools,
+              options.agentId
+            );
+            logModelCommunicationEvent({
+              direction: "incoming",
+              stage: "after_normalize",
+              source: "claude.ts:content_block_stop_normalized",
+              requestId: streamRequestId ?? clientRequestId,
+              model: options.model,
+              querySource: options.querySource,
+              payload: {
+                index: part.index,
+                rawContentBlock: contentBlock,
+                normalizedContent
+              }
+            });
             const m = {
               message: {
                 ...partialMessage,
-                content: normalizeContentFromAPI(
-                  [contentBlock],
-                  tools,
-                  options.agentId
-                )
+                content: normalizedContent
               },
               requestId: streamRequestId ?? void 0,
               type: "assistant",
@@ -1621,14 +1754,38 @@ ${deferredToolList}
         (params) => captureAPIRequest(params, options.querySource),
         streamRequestId
       );
+      logModelCommunicationEvent({
+        direction: "incoming",
+        stage: "api_response",
+        source: "claude.ts:non_streaming_response",
+        requestId: streamRequestId,
+        model: result.model ?? options.model,
+        querySource: options.querySource,
+        payload: result
+      });
+      const normalizedContent = normalizeContentFromAPI(
+        result.content,
+        tools,
+        options.agentId
+      );
+      logModelCommunicationEvent({
+        direction: "incoming",
+        stage: "after_normalize",
+        source: "claude.ts:non_streaming_normalized",
+        requestId: streamRequestId,
+        model: result.model ?? options.model,
+        querySource: options.querySource,
+        payload: {
+          rawContent: result.content,
+          normalizedContent,
+          stopReason: result.stop_reason,
+          usage: result.usage
+        }
+      });
       const m = {
         message: {
           ...result,
-          content: normalizeContentFromAPI(
-            result.content,
-            tools,
-            options.agentId
-          )
+          content: normalizedContent
         },
         requestId: streamRequestId ?? void 0,
         type: "assistant",
@@ -1689,14 +1846,38 @@ ${deferredToolList}
           (params) => captureAPIRequest(params, options.querySource),
           failedRequestId
         );
+        logModelCommunicationEvent({
+          direction: "incoming",
+          stage: "api_response",
+          source: "claude.ts:non_streaming_response",
+          requestId: failedRequestId,
+          model: result.model ?? options.model,
+          querySource: options.querySource,
+          payload: result
+        });
+        const normalizedContent = normalizeContentFromAPI(
+          result.content,
+          tools,
+          options.agentId
+        );
+        logModelCommunicationEvent({
+          direction: "incoming",
+          stage: "after_normalize",
+          source: "claude.ts:non_streaming_normalized",
+          requestId: failedRequestId,
+          model: result.model ?? options.model,
+          querySource: options.querySource,
+          payload: {
+            rawContent: result.content,
+            normalizedContent,
+            stopReason: result.stop_reason,
+            usage: result.usage
+          }
+        });
         const m = {
           message: {
             ...result,
-            content: normalizeContentFromAPI(
-              result.content,
-              tools,
-              options.agentId
-            )
+            content: normalizedContent
           },
           requestId: streamRequestId ?? void 0,
           type: "assistant",

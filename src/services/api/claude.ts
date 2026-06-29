@@ -74,6 +74,10 @@ import { errorMessage } from '../../utils/errors.js'
 import { computeFingerprintFromMessages } from '../../utils/fingerprint.js'
 import { captureAPIRequest, logError } from '../../utils/log.js'
 import {
+  logModelCommunicationEvent,
+  shouldLogFullStreamDeltas,
+} from '../../utils/modelCommunicationLog.js'
+import {
   createAssistantAPIErrorMessage,
   createUserMessage,
   ensureToolResultPairing,
@@ -811,6 +815,89 @@ function getNonstreamingFallbackTimeoutMs(): number {
   return isEnvTruthy(process.env.CLAUDE_CODE_REMOTE) ? 120_000 : 300_000
 }
 
+function summarizeModelCommunicationStreamEvent(
+  part: BetaRawMessageStreamEvent,
+): unknown {
+  if (shouldLogFullStreamDeltas()) return part
+
+  switch (part.type) {
+    case 'message_start':
+      return {
+        type: part.type,
+        message: part.message
+          ? {
+              id: part.message.id,
+              model: part.message.model,
+              role: part.message.role,
+              stop_reason: part.message.stop_reason,
+              usage: part.message.usage,
+              contentLength: part.message.content?.length,
+            }
+          : undefined,
+      }
+    case 'content_block_start':
+      return {
+        type: part.type,
+        index: part.index,
+        content_block: summarizeStreamContentBlock(part.content_block),
+      }
+    case 'content_block_delta':
+      return {
+        type: part.type,
+        index: part.index,
+        delta: summarizeStreamDelta(part.delta),
+      }
+    case 'content_block_stop':
+      return { type: part.type, index: part.index }
+    case 'message_delta':
+      return {
+        type: part.type,
+        delta: part.delta,
+        usage: part.usage,
+      }
+    case 'message_stop':
+      return { type: part.type }
+    default:
+      return { type: (part as { type?: string }).type, event: part }
+  }
+}
+
+function summarizeStreamContentBlock(block: unknown): unknown {
+  if (!block || typeof block !== 'object') return block
+  const record = block as Record<string, unknown>
+  return {
+    type: record.type,
+    id: record.id,
+    name: record.name,
+    text: summarizeText(record.text),
+    thinking: summarizeText(record.thinking),
+    inputType: record.input === undefined ? undefined : typeof record.input,
+    hasSignature: typeof record.signature === 'string' && record.signature.length > 0,
+  }
+}
+
+function summarizeStreamDelta(delta: unknown): unknown {
+  if (!delta || typeof delta !== 'object') return delta
+  const record = delta as Record<string, unknown>
+  return {
+    type: record.type,
+    text: summarizeText(record.text),
+    partial_json: summarizeText(record.partial_json),
+    thinking: summarizeText(record.thinking),
+    connector_text: summarizeText(record.connector_text),
+    signatureLength:
+      typeof record.signature === 'string' ? record.signature.length : undefined,
+  }
+}
+
+function summarizeText(value: unknown): unknown {
+  if (typeof value !== 'string') return undefined
+  return {
+    chars: value.length,
+    preview: value.slice(0, 500),
+  }
+}
+
 /**
  * Helper generator for non-streaming API requests.
  * Encapsulates the common pattern of creating a withRetry generator,
@@ -859,19 +946,34 @@ export async function* executeNonStreamingRequest(
         retryParams,
         MAX_NON_STREAMING_TOKENS,
       )
+      const apiParams = {
+        ...adjustedParams,
+        model: normalizeModelStringForAPI(adjustedParams.model),
+      }
+      logModelCommunicationEvent({
+        direction: 'outgoing',
+        stage: 'api_request',
+        source: 'claude.ts:non_streaming_messages_create',
+        requestId: originatingRequestId,
+        model: apiParams.model,
+        querySource: retryOptions.querySource,
+        payload: {
+          params: apiParams,
+          requestOptions: {
+            hasSignal: true,
+            timeout: fallbackTimeoutMs,
+          },
+          attempt,
+          originatingRequestId,
+        },
+      })
 
       try {
         // biome-ignore lint/plugin: non-streaming API call
-        return await anthropic.beta.messages.create(
-          {
-            ...adjustedParams,
-            model: normalizeModelStringForAPI(adjustedParams.model),
-          },
-          {
-            signal: retryOptions.signal,
-            timeout: fallbackTimeoutMs,
-          },
-        )
+        return await anthropic.beta.messages.create(apiParams, {
+          signal: retryOptions.signal,
+          timeout: fallbackTimeoutMs,
+        })
       } catch (err) {
         // User aborts are not errors — re-throw immediately without logging
         if (err instanceof APIUserAbortError) throw err
@@ -1816,6 +1918,22 @@ async function* queryModel(
             ? randomUUID()
             : undefined
 
+        logModelCommunicationEvent({
+          direction: 'outgoing',
+          stage: 'api_request',
+          source: 'claude.ts:streaming_messages_create',
+          requestId: clientRequestId,
+          model: params.model,
+          querySource: options.querySource,
+          payload: {
+            params: { ...params, stream: true },
+            requestOptions: {
+              hasSignal: true,
+              hasClientRequestId: !!clientRequestId,
+            },
+          },
+        })
+
         // Use raw stream instead of BetaMessageStream to avoid O(n²) partial JSON parsing
         // BetaMessageStream calls partialParse() on every input_json_delta, which we don't need
         // since we handle tool input accumulation ourselves
@@ -1937,10 +2055,22 @@ async function* queryModel(
       const STALL_THRESHOLD_MS = 30_000 // 30 seconds
       let totalStallTime = 0
       let stallCount = 0
+      let modelCommunicationStreamSequence = 0
 
       for await (const part of stream) {
         resetStreamIdleTimer()
         const now = Date.now()
+        modelCommunicationStreamSequence++
+        logModelCommunicationEvent({
+          direction: 'incoming',
+          stage: 'api_stream_event',
+          source: 'claude.ts:raw_stream',
+          requestId: streamRequestId ?? clientRequestId,
+          sequence: modelCommunicationStreamSequence,
+          model: options.model,
+          querySource: options.querySource,
+          payload: summarizeModelCommunicationStreamEvent(part),
+        })
 
         // Detect and log streaming stalls (only after first event to avoid counting TTFB)
         if (lastEventTime !== null) {
@@ -2190,14 +2320,28 @@ async function* queryModel(
               })
               throw new Error('Message not found')
             }
+            const normalizedContent = normalizeContentFromAPI(
+              [contentBlock] as BetaContentBlock[],
+              tools,
+              options.agentId,
+            )
+            logModelCommunicationEvent({
+              direction: 'incoming',
+              stage: 'after_normalize',
+              source: 'claude.ts:content_block_stop_normalized',
+              requestId: streamRequestId ?? clientRequestId,
+              model: options.model,
+              querySource: options.querySource,
+              payload: {
+                index: part.index,
+                rawContentBlock: contentBlock,
+                normalizedContent,
+              },
+            })
             const m: AssistantMessage = {
               message: {
                 ...partialMessage,
-                content: normalizeContentFromAPI(
-                  [contentBlock] as BetaContentBlock[],
-                  tools,
-                  options.agentId,
-                ),
+                content: normalizedContent,
               },
               requestId: streamRequestId ?? undefined,
               type: 'assistant',
@@ -2569,14 +2713,39 @@ async function* queryModel(
         streamRequestId,
       )
 
+      logModelCommunicationEvent({
+        direction: 'incoming',
+        stage: 'api_response',
+        source: 'claude.ts:non_streaming_response',
+        requestId: streamRequestId,
+        model: result.model ?? options.model,
+        querySource: options.querySource,
+        payload: result,
+      })
+      const normalizedContent = normalizeContentFromAPI(
+        result.content,
+        tools,
+        options.agentId,
+      )
+      logModelCommunicationEvent({
+        direction: 'incoming',
+        stage: 'after_normalize',
+        source: 'claude.ts:non_streaming_normalized',
+        requestId: streamRequestId,
+        model: result.model ?? options.model,
+        querySource: options.querySource,
+        payload: {
+          rawContent: result.content,
+          normalizedContent,
+          stopReason: result.stop_reason,
+          usage: result.usage,
+        },
+      })
+
       const m: AssistantMessage = {
         message: {
           ...result,
-          content: normalizeContentFromAPI(
-            result.content,
-            tools,
-            options.agentId,
-          ),
+          content: normalizedContent,
         },
         requestId: streamRequestId ?? undefined,
         type: 'assistant',
@@ -2666,14 +2835,39 @@ async function* queryModel(
           failedRequestId,
         )
 
+        logModelCommunicationEvent({
+          direction: 'incoming',
+          stage: 'api_response',
+          source: 'claude.ts:non_streaming_response',
+          requestId: failedRequestId,
+          model: result.model ?? options.model,
+          querySource: options.querySource,
+          payload: result,
+        })
+        const normalizedContent = normalizeContentFromAPI(
+          result.content,
+          tools,
+          options.agentId,
+        )
+        logModelCommunicationEvent({
+          direction: 'incoming',
+          stage: 'after_normalize',
+          source: 'claude.ts:non_streaming_normalized',
+          requestId: failedRequestId,
+          model: result.model ?? options.model,
+          querySource: options.querySource,
+          payload: {
+            rawContent: result.content,
+            normalizedContent,
+            stopReason: result.stop_reason,
+            usage: result.usage,
+          },
+        })
+
         const m: AssistantMessage = {
           message: {
             ...result,
-            content: normalizeContentFromAPI(
-              result.content,
-              tools,
-              options.agentId,
-            ),
+            content: normalizedContent,
           },
           requestId: streamRequestId ?? undefined,
           type: 'assistant',

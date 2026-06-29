@@ -39,6 +39,7 @@ import type {
   TombstoneMessage,
 } from './types/message.js'
 import { logError } from './utils/log.js'
+import { logModelCommunicationEvent } from './utils/modelCommunicationLog.js'
 import {
   PROMPT_TOO_LONG_ERROR_MESSAGE,
   isPromptTooLongMessage,
@@ -657,8 +658,53 @@ async function* queryLoop(
         try {
           let streamingFallbackOccured = false
           queryCheckpoint('query_api_streaming_start')
+          const messagesWithUserContext = prependUserContext(
+            messagesForQuery,
+            userContext,
+          )
+          logModelCommunicationEvent({
+            direction: 'outgoing',
+            stage: 'before_transform',
+            source: 'query.ts:before_callModel',
+            model: currentModel,
+            querySource,
+            payload: {
+              messages: messagesWithUserContext,
+              systemPrompt: fullSystemPrompt,
+              thinkingConfig: toolUseContext.options.thinkingConfig,
+              tools: toolUseContext.options.tools,
+              options: {
+                model: currentModel,
+                fallbackModel,
+                querySource,
+                fastMode: config.gates.fastModeEnabled
+                  ? appState.fastMode
+                  : undefined,
+                isNonInteractiveSession:
+                  toolUseContext.options.isNonInteractiveSession,
+                hasAppendSystemPrompt:
+                  !!toolUseContext.options.appendSystemPrompt,
+                maxOutputTokensOverride,
+                hasPendingMcpServers: appState.mcp.clients.some(
+                  c => c.type === 'pending',
+                ),
+                effortValue: appState.effortValue,
+                advisorModel: appState.advisorModel,
+                skipCacheWrite,
+                agentId: toolUseContext.agentId,
+                taskBudget: params.taskBudget
+                  ? {
+                      total: params.taskBudget.total,
+                      ...(taskBudgetRemaining !== undefined && {
+                        remaining: taskBudgetRemaining,
+                      }),
+                    }
+                  : undefined,
+              },
+            },
+          })
           for await (const message of deps.callModel({
-            messages: prependUserContext(messagesForQuery, userContext),
+            messages: messagesWithUserContext,
             systemPrompt: fullSystemPrompt,
             thinkingConfig: toolUseContext.options.thinkingConfig,
             tools: toolUseContext.options.tools,
@@ -852,11 +898,26 @@ async function* queryLoop(
               for (const result of streamingToolExecutor.getCompletedResults()) {
                 if (result.message) {
                   yield result.message
+                  logModelCommunicationEvent({
+                    direction: 'outgoing',
+                    stage: 'before_transform',
+                    source: 'query.ts:tool_result_normalize',
+                    querySource,
+                    payload: { message: result.message },
+                  })
+                  const normalizedToolMessages = normalizeMessagesForAPI(
+                    [result.message],
+                    toolUseContext.options.tools,
+                  )
+                  logModelCommunicationEvent({
+                    direction: 'outgoing',
+                    stage: 'after_transform',
+                    source: 'query.ts:tool_result_normalize',
+                    querySource,
+                    payload: { messages: normalizedToolMessages },
+                  })
                   toolResults.push(
-                    ...normalizeMessagesForAPI(
-                      [result.message],
-                      toolUseContext.options.tools,
-                    ).filter(_ => _.type === 'user'),
+                    ...normalizedToolMessages.filter(_ => _.type === 'user'),
                   )
                 }
               }

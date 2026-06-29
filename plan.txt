@@ -1,0 +1,217 @@
+Plan: 增加模型通信日志功能
+
+Context
+
+用户希望项目能够输出“与模型的通信日志”，并且明确要求包含四类信息：发出信息在内部转换前、发出信息在内部转换后、收到信息在内部转换前、收到信息在内部转换后。该项目是 TypeScript/Claude Code 风格架构，核心模型调用路径分为两层：src/query.ts 负责高层 turn orchestration、压缩/上下文/工具结果处理；src/services/api/claude.ts 负责将内部消息、system prompt、tools 转换为 Anthropic Messages API 参数并处理 streaming/non-streaming 响应；src/utils/messages.ts 提供 normalizeMessagesForAPI(...) 与 normalizeContentFromAPI(...) 等关键转换函数。
+
+这类日志可能包含用户 prompt、文件内容、工具结果、模型输出、headers/metadata 等敏感信息，因此必须默认关闭、显式开启、落到本地专用日志文件、做递归字段脱敏/secret pattern 脱敏/截断，并且不能影响 streaming、tool_use/tool_result 配对、prompt caching 或现有对象引用语义。
+
+Recommended Implementation
+
+1. 新增专用模型通信日志模块
+
+新增 src/utils/modelCommunicationLog.ts，集中实现：
+
+- 开关：CLAUDE_CODE_LOG_MODEL_COMMUNICATION=1。
+- 可选输出路径：CLAUDE_CODE_MODEL_COMMUNICATION_LOG_FILE=/absolute/path.jsonl。
+- 可选截断控制：
+  - CLAUDE_CODE_MODEL_COMMUNICATION_LOG_MAX_FIELD_CHARS，默认约 20000。
+  - CLAUDE_CODE_MODEL_COMMUNICATION_LOG_MAX_EVENT_CHARS，默认约 200000。
+- 可选 stream delta 全量控制：CLAUDE_CODE_MODEL_COMMUNICATION_LOG_STREAM_DELTAS=1；默认只记录 stream event 摘要，避免日志爆炸。
+- JSONL writer：默认输出到 ~/.claude/model-communication/<sessionId>.jsonl，使用现有 createBufferedWriter / registerCleanup / getClaudeConfigHomeDir / getSessionId 模式。
+- logModelCommunicationEvent(...) API，形如：
+
+logModelCommunicationEvent({
+  direction: 'outgoing' | 'incoming',
+  stage: 'before_transform' | 'after_transform' | 'api_request' | 'api_stream_event' | 'api_response' | 'after_normalize',
+  source: 'query.ts:before_callModel',
+  requestId,
+  model,
+  querySource,
+  sequence,
+  payload,
+})
+
+日志行建议字段：timestamp、sessionId、eventVersion、direction、stage、source、requestId、sequence、model、querySource、payload。
+
+实现要求：关闭时必须快速 no-op，不做深拷贝/JSON stringify/脱敏；开启时 logger 内部创建安全副本并序列化，绝不修改传入对象。
+
+2. 脱敏与截断策略
+
+在 modelCommunicationLog.ts 内实现两层脱敏：
+
+1. 递归字段名脱敏：对大小写不敏感的敏感字段替换为 <REDACTED:field>，包括但不限于 api_key、authorization、access_token、refresh_token、token、secret、password、private_key、client_secret、cookie、x-api-key 等。
+2. 值级 secret pattern 脱敏：复用 src/services/teamMemorySync/secretScanner.ts 的 redactSecrets(content)，覆盖 Anthropic/OpenAI/GitHub/AWS/Slack/private key 等高置信 secret。
+截断策略：
+
+- 递归截断长字符串，保留预览并追加 <TRUNCATED chars=...>。
+- 控制数组/对象遍历深度和条目数量，避免超大 tool result 导致日志不可控。
+- 最终 JSONL 行超过上限时，将 payload 压缩为 { note, originalSerializedChars, preview }。
+- 使用 src/utils/slowOperations.ts 的 jsonStringify，并捕获所有日志错误，日志失败不能影响模型调用。
+
+3. 记录“发出信息：转换前”
+
+修改 src/query.ts，在调用 deps.callModel(...) 之前记录高层内部请求形态。
+
+关键点：当前调用会传：
+
+- messages: prependUserContext(messagesForQuery, userContext)
+- systemPrompt: fullSystemPrompt
+- thinkingConfig
+- tools
+- options.model / fallbackModel
+- querySource
+
+为了避免调用 prependUserContext(...) 两次，先赋值：
+
+const messagesWithUserContext = prependUserContext(messagesForQuery, userContext)
+
+然后同一个对象既传给 logger，也传给 deps.callModel(...)。日志事件：
+
+direction: outgoing
+stage: before_transform
+source: query.ts:before_callModel
+
+payload 包含内部 messages、full system prompt、thinking config、工具名/工具概要、模型、fallback model、query source、turn count 等。
+
+4. 记录“发出信息：转换后”
+
+修改 src/services/api/claude.ts，在 final API params 构造完成后记录：
+
+- streaming 路径：const params = paramsFromContext(context) 之后、anthropic.beta.messages.create({ ...params, stream: true }, ...) 之前。
+- non-streaming fallback 路径：adjustedParams/最终 params 准备好后、anthropic.beta.messages.create(...) 之前。
+
+日志事件：
+
+direction: outgoing
+stage: api_request
+source: claude.ts:streaming_messages_create
+
+以及：
+
+direction: outgoing
+stage: api_request
+source: claude.ts:non_streaming_messages_create
+
+payload 应包含最终 SDK/API 请求形态：model、messages、system、tools、tool_choice、betas、metadata、max_tokens、thinking、context_management、output_config、speed、stream 等。该点代表经过 normalizeMessagesForAPI(...)、tool schema conversion、cache breakpoint/system block 处理后的最终发出信息。
+5. 记录“收到信息：转换前”
+
+修改 src/services/api/claude.ts：
+
+- 在 raw streaming loop for await (const part of stream) 内记录 incoming raw event。
+- 默认记录紧凑摘要：event type、index、delta type、文本/partial_json 长度与脱敏预览、usage、stop reason、content block type 等。
+- 仅在 CLAUDE_CODE_MODEL_COMMUNICATION_LOG_STREAM_DELTAS=1 时记录完整 raw stream event（仍脱敏/截断）。
+
+日志事件：
+
+direction: incoming
+stage: api_stream_event
+source: claude.ts:raw_stream
+
+non-streaming fallback 响应在 executeNonStreamingRequest(...) 收到 BetaMessage 后、归一化前记录：
+
+direction: incoming
+stage: api_response
+source: claude.ts:non_streaming_response
+
+要求：不改变 stream 消费顺序，不缓冲整个 stream，不额外解析 partial JSON，不让日志异常中断 stream。
+
+6. 记录“收到信息：转换后”
+
+优先在 src/services/api/claude.ts 的 normalizeContentFromAPI(...) 调用点周围记录，而不是修改 normalizeContentFromAPI(...) 签名。
+
+在 streaming content_block_stop 中：
+
+- 归一化前可记录 raw completed content block（如果 raw stream event 已覆盖，可保持轻量）。
+- 调用 normalizeContentFromAPI([contentBlock], tools, options.agentId) 后记录 normalized content。
+
+日志事件：
+
+direction: incoming
+stage: after_normalize
+source: claude.ts:content_block_stop_normalized
+
+在 non-streaming fallback 中：
+
+- normalizeContentFromAPI(result.content, tools, options.agentId) 后记录 normalized content。
+
+日志事件：
+
+direction: incoming
+stage: after_normalize
+source: claude.ts:non_streaming_normalized
+
+不在转换函数内做任何实际内容修改；日志脱敏只发生在 logger 的序列化副本中。
+
+7. 工具结果发出转换的补充日志
+在 src/query.ts 中工具结果被转换回 API replay messages 的地方，围绕 normalizeMessagesForAPI([result.message], toolUseContext.options.tools) 记录 before/after：
+
+direction: outgoing
+stage: before_transform
+direction: outgoing
+stage: after_transform
+source: query.ts:tool_result_normalize
+
+这能覆盖 tool_use → tool_result 后续发往模型的关键转换，同时必须保持现有 tool_use/tool_result id 和顺序不变。
+
+Critical Files
+
+- src/utils/modelCommunicationLog.ts — 新增核心日志模块。
+- src/query.ts — 高层 outgoing before-transform、tool result before/after-transform 日志点。
+- src/services/api/claude.ts — final API request、raw stream incoming、non-streaming response、normalized incoming 日志点。
+- src/services/teamMemorySync/secretScanner.ts — 复用 redactSecrets。
+- src/utils/slowOperations.ts — 复用 jsonStringify。
+- src/utils/bufferedWriter.ts、src/utils/cleanupRegistry.ts、src/utils/envUtils.ts — 复用写入/清理/env helper。
+
+暂不建议第一版直接改 src/utils/messages.ts 的 normalizeMessagesForAPI(...) / normalizeContentFromAPI(...) 函数签名；先在调用点记录，风险更低。
+
+Verification
+
+1. 构建：
+
+cd /Users/happyelements/claude-code
+npm run build
+
+2. 现有 smoke：
+
+node scripts/smoke-functional.mjs
+
+3. logger 单元/脚本级验证（可用一个小 Node 脚本或新增 smoke check）：
+
+- 未设置 CLAUDE_CODE_LOG_MODEL_COMMUNICATION 时，不创建日志文件，且 log API 快速 no-op。
+- 设置 CLAUDE_CODE_LOG_MODEL_COMMUNICATION=1 和 CLAUDE_CODE_MODEL_COMMUNICATION_LOG_FILE=/tmp/model-comm.jsonl 后，调用 logger 写入 JSONL。
+- payload 中嵌套 authorization、api_key、token、假 Anthropic/GitHub/AWS secret 时，输出被脱敏。
+- 长字符串被截断。
+- 原始对象在 logger 调用前后 deep-equal，证明未被修改。
+
+4. 模型调用路径验证：
+
+用最小 TUI/CLI 或现有 prompt 路径触发一次模型请求，设置：
+
+CLAUDE_CODE_LOG_MODEL_COMMUNICATION=1 \
+CLAUDE_CODE_MODEL_COMMUNICATION_LOG_FILE=/tmp/model-comm.jsonl \
+node dist/src/entrypoints/cli.js --bare --settings /Users/happyelements/.claude/settings.json
+
+期望 JSONL 至少包含：
+
+- outgoing / before_transform / query.ts:before_callModel
+- outgoing / api_request / claude.ts:streaming_messages_create
+- incoming / api_stream_event / claude.ts:raw_stream
+- incoming / after_normalize / claude.ts:content_block_stop_normalized
+
+如果 API 不可用，仍应能在请求前看到 outgoing 日志；错误路径不能因 logging 抛出额外错误。
+
+5. Streaming/tool-use 回归：
+
+- 对比未启用日志与启用日志时，stream event 顺序和 tool_use/tool_result id 不变。
+- 启用默认 stream 摘要时日志量可控；启用 CLAUDE_CODE_MODEL_COMMUNICATION_LOG_STREAM_DELTAS=1 时可看到脱敏截断后的完整 delta payload。
+
+User-facing Usage
+
+实现后使用方式：
+
+CLAUDE_CODE_LOG_MODEL_COMMUNICATION=1 \
+CLAUDE_CODE_MODEL_COMMUNICATION_LOG_FILE=/tmp/claude-model-comm.jsonl \
+node dist/src/entrypoints/cli.js --bare --settings /Users/happyelements/.claude/settings.json
+
+需要在说明中明确：该日志可能包含用户 prompt、工具结果、文件内容和模型输出；虽然会脱敏和截断，但仍应只在本地调试时开启，不要提交到 Git 或发送给无关人员。
